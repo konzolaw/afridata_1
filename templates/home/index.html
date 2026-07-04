@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 
+{# Browser Tab Title #}
 {% block title %}AfriData - Discover Africa's Data Stories{% endblock %}
 
 {% block extra_css %}
 <style>
+    /* Status dot pulse animation */
     @keyframes pulse {
         0%, 100% { opacity: 1; transform: scale(1); }
         50% { opacity: .4; transform: scale(1.1); }
@@ -12,6 +14,8 @@
     .pulse-dot {
         animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
+    
+    /* Tag hover interaction */
     .topic-tag:hover {
         transform: translateY(-5px);
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -19,11 +23,13 @@
 </style>
 {% endblock %}
 
+{# Header Styling #}
 {% block header_class %}gradient-header{% endblock %}
 
+{# Hero Block #}
 {% block header_content %}
 <div class="relative min-h-[500px] flex items-center justify-center py-24 px-4 overflow-hidden">
-    <!-- Sophisticated Background -->
+    <!-- Visual background effects -->
     <div class="absolute inset-0 z-0 pointer-events-none">
         <div class="absolute top-[-20%] right-[-10%] w-[60%] h-[70%] bg-brand-teal/15 blur-[120px] rounded-full"></div>
         <div class="absolute bottom-[-10%] left-[-10%] w-[50%] h-[60%] bg-brand-blue/25 blur-[100px] rounded-full"></div>
@@ -32,147 +38,164 @@
         </div>
     </div>
 
-        <div class="max-w-4xl mx-auto text-center">
-            <h1 class="text-5xl md:text-6xl font-bold mb-6 tracking-tight !text-white">
-                African Data Library
-            </h1>
-            <p class="text-lg md:text-xl mb-10 text-white/80 font-light max-w-2xl mx-auto leading-relaxed">
-                Access verified datasets for research and analysis across the continent.
-            </p>
-            
-            <div class="flex flex-wrap justify-center gap-4 mb-14">
-                <button onclick="window.location.href=`{% url 'login_signup' %}?mode=signup`" class="btn-primary !px-8 py-3.5">
-                    Create Account
-                </button>
-                <button onclick="window.location.href=`{% url 'dataset_list' %}`" class="btn-secondary !text-white !border-white/20 hover:!bg-white/10 !px-8 py-3.5">
-                    Browse Datasets
+    <!-- Hero Content -->
+    <div class="max-w-4xl mx-auto text-center relative z-10">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 tracking-tight !text-white font-caslon">
+            African Data Library
+        </h1>
+        <p class="text-lg md:text-xl mb-10 text-white/80 font-light max-w-2xl mx-auto leading-relaxed">
+            Access verified datasets for research and analysis across the continent.
+        </p>
+        
+        <!-- CTA Action Buttons -->
+        <div class="flex flex-wrap justify-center gap-4 mb-14">
+            <button onclick="window.location.href=`{% url 'login_signup' %}?mode=signup`" class="btn-primary !px-8 py-3.5">
+                Create Account
+            </button>
+            <button onclick="window.location.href=`{% url 'dataset_list' %}`" class="btn-secondary !text-white !border-white/20 hover:!bg-white/10 !px-8 py-3.5">
+                Browse Datasets
+            </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="max-w-4xl mx-auto relative group">
+            <div class="absolute -inset-1 bg-gradient-to-r from-brand-teal/30 to-brand-green/30 rounded-2xl blur-lg opacity-0 group-focus-within:opacity-100 transition duration-700"></div>
+            <div class="relative flex items-center bg-white rounded-2xl shadow-3xl overflow-hidden p-1.5 border border-white/20">
+                <div class="pl-6 text-gray-400">
+                    <i class="fas fa-search text-xl"></i>
+                </div>
+                <input id="searchInput" type="text" 
+                       placeholder="Search demographic trends, climate models, or market insights..." 
+                       class="w-full pl-5 pr-36 py-5 text-gray-900 text-lg border-none focus:ring-0 focus:outline-none placeholder:text-gray-400 font-normal" />
+                <button onclick="performSearch()" class="btn-primary !py-4 !px-12 !rounded-xl !bg-brand-blue hover:!bg-brand-blue/90 !shadow-none">
+                     Search
                 </button>
             </div>
-
-            <!-- Global Search Infrastructure -->
-            <div class="max-w-4xl mx-auto relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-brand-teal/30 to-brand-green/30 rounded-2xl blur-lg opacity-0 group-focus-within:opacity-100 transition duration-700"></div>
-                <div class="relative flex items-center bg-white rounded-2xl shadow-3xl overflow-hidden p-1.5 border border-white/20">
-                    <div class="pl-6 text-gray-400">
-                        <i class="fas fa-search text-xl"></i>
-                    </div>
-                    <input id="searchInput" type="text" 
-                           placeholder="Search demographic trends, climate models, or market insights..." 
-                           class="w-full pl-5 pr-36 py-5 text-gray-900 text-lg border-none focus:ring-0 focus:outline-none placeholder:text-gray-400 font-normal" />
-                    <button onclick="performSearch()" class="btn-primary !py-4 !px-12 !rounded-xl !bg-brand-blue hover:!bg-brand-blue/90 !shadow-none">
-                         Search
-                    </button>
-                </div>
-                <div class="mt-5 flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm text-white/50 font-medium">
-                    <span class="text-white/30 uppercase tracking-widest text-[10px] flex items-center">Popular Topics:</span>
-                    <button onclick="quickSearch('Health Systems')" class="hover:text-brand-teal transition-colors">Health Systems</button>
-                    <button onclick="quickSearch('Renewable Energy')" class="hover:text-brand-teal transition-colors">Renewable Energy</button>
-                    <button onclick="quickSearch('Fintech Metrics')" class="hover:text-brand-teal transition-colors">Fintech Metrics</button>
-                </div>
+            
+            <!-- Quick Link Tags -->
+            <div class="mt-5 flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm text-white/50 font-medium">
+                <span class="text-white/30 uppercase tracking-widest text-[10px] flex items-center">Popular Topics:</span>
+                <button onclick="quickSearch('Health Systems')" class="hover:text-brand-teal transition-colors">Health Systems</button>
+                <button onclick="quickSearch('Renewable Energy')" class="hover:text-brand-teal transition-colors">Renewable Energy</button>
+                <button onclick="quickSearch('Fintech Metrics')" class="hover:text-brand-teal transition-colors">Fintech Metrics</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Impact Ribbon -->
+<!-- Stats Counter Ribbon -->
 <div class="relative z-20 -mt-12 px-4 mb-16">
     <div class="max-w-6xl mx-auto bg-white rounded-[2rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] border border-gray-100 p-10 md:p-14">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 items-center">
+            
+            <!-- Datasets Count -->
             <div class="text-center group">
                 <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 opacity-60 group-hover:opacity-100 transition-opacity">Datasets</div>
                 <div class="text-4xl md:text-5xl font-bold text-brand-blue tabular-nums animate-number" data-target="{{ total_datasets|default:'15000' }}">{{ total_datasets|default:"15,000" }}</div>
             </div>
+            
+            <!-- Countries Count -->
             <div class="text-center group border-l border-gray-100">
                 <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 opacity-60 group-hover:opacity-100 transition-opacity">Countries</div>
                 <div class="text-4xl md:text-5xl font-bold text-brand-blue tabular-nums animate-number" data-target="{{ total_countries|default:'54' }}">{{ total_countries|default:"54" }}</div>
             </div>
+            
+            <!-- Downloads Count -->
             <div class="text-center group border-l border-gray-100">
                 <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 opacity-60 group-hover:opacity-100 transition-opacity">Downloads</div>
                 <div class="text-4xl md:text-5xl font-bold text-brand-blue tabular-nums animate-number" data-target="{{ total_downloads|default:'250000' }}">{{ total_downloads|default:"250K" }}+</div>
             </div>
+            
+            <!-- Researchers Count -->
             <div class="text-center group border-l border-gray-100">
                 <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 opacity-60 group-hover:opacity-100 transition-opacity">Researchers</div>
                 <div class="text-4xl md:text-5xl font-bold text-brand-blue tabular-nums animate-number" data-target="{{ total_researchers|default:'5000' }}">{{ total_researchers|default:"5,000" }}+</div>
             </div>
+            
         </div>
     </div>
+</div>
 {% endblock %}
 
+{# Core Content Block #}
 {% block content %}
-<!-- Trending Section -->
+
+<!-- Trending & Popular Section -->
 <section class="max-w-7xl mx-auto px-4 py-24">
     <div class="text-center mb-16">
         <h2 class="text-3xl font-bold mb-4">Popular Datasets</h2>
         <p class="text-gray-500 max-w-2xl mx-auto">Explore popular datasets and topics this week.</p>
     </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        
+        <!-- Trending Datasets List -->
+        <div class="card-fancy p-8 flex flex-col">
+            <h4 class="text-xl font-bold mb-6 flex items-center">
+                Trending Datasets
+                <span class="pulse-dot ml-3 w-2 h-2 bg-brand-green rounded-full shadow-sm"></span>
+            </h4>
             
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                <!-- Trending Datasets -->
-                <div class="card-fancy p-8 flex flex-col">
-                    <h4 class="text-xl font-bold mb-6 flex items-center">
-                        Trending Datasets
-                        <span class="pulse-dot ml-3 w-2 h-2 bg-brand-green rounded-full shadow-sm"></span>
-                    </h4>
-                    
-                    <div class="space-y-4 flex-1">
-                        {% for dataset in trending_datasets|slice:":3" %}
-                        <div class="group/item flex items-center p-3 rounded-xl hover:bg-brand-offwhite transition-all cursor-pointer border border-transparent hover:border-gray-100" onclick="viewDataset('{{ dataset.slug }}')">
+            <div class="space-y-4 flex-1">
+                {% for dataset in trending_datasets|slice:":3" %}
+                <div class="group/item flex items-center p-3 rounded-xl hover:bg-brand-offwhite transition-all cursor-pointer border border-transparent hover:border-gray-100" onclick="viewDataset('{{ dataset.slug }}')">
 
-                            <!-- Mini Cover -->
-                            <div class="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 mr-4">
-                                <img src="{{ dataset.get_cover_photo_url }}" 
-                                     alt="Cover" 
-                                     class="w-full h-full object-cover opacity-70 group-hover/item:scale-110 transition-transform duration-500">
-                            </div>
-                            
-                            <div class="flex-1 min-w-0">
-                                <h5 class="font-bold text-gray-800 text-sm mb-0.5 line-clamp-1 group-hover/item:text-brand-blue transition-colors">{{ dataset.title }}</h5>
-                                <div class="flex items-center space-x-3 text-[10px] text-gray-400 font-medium">
-                                    <span class="flex items-center"><i class="fas fa-arrow-down mr-1 opacity-50"></i> {{ dataset.downloads }}</span>
-                                    <span class="flex items-center text-brand-amber"><i class="fas fa-star mr-1 opacity-50"></i> {{ dataset.rating|floatformat:1 }}</span>
-                                </div>
-                            </div>
-                            
-                            <div class="ml-4 opacity-0 group-hover/item:opacity-100 transition-opacity">
-                                <i class="fas fa-chevron-right text-[10px] text-brand-blue"></i>
-                            </div>
-                        </div>
-                        {% endfor %}
+                    <div class="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 mr-4">
+                        <img src="{{ dataset.get_cover_photo_url }}" 
+                             alt="Cover" 
+                             class="w-full h-full object-cover opacity-70 group-hover/item:scale-110 transition-transform duration-500">
                     </div>
                     
-                    <button onclick="window.location.href=`{% url 'dataset_list' %}?sort=downloads`" class="w-full mt-6 text-brand-teal font-bold text-sm hover:underline">
-                        View All Trends
-                    </button>
+                    <div class="flex-1 min-w-0">
+                        <h5 class="font-bold text-gray-800 text-sm mb-0.5 line-clamp-1 group-hover/item:text-brand-blue transition-colors">{{ dataset.title }}</h5>
+                        <div class="flex items-center space-x-3 text-[10px] text-gray-400 font-medium">
+                            <span class="flex items-center"><i class="fas fa-arrow-down mr-1 opacity-50"></i> {{ dataset.downloads }}</span>
+                            <span class="flex items-center text-brand-amber"><i class="fas fa-star mr-1 opacity-50"></i> {{ dataset.rating|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ml-4 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                        <i class="fas fa-chevron-right text-[10px] text-brand-blue"></i>
+                    </div>
                 </div>
-                
-                <!-- Trending Topics -->
-                <div class="card-fancy p-8 flex flex-col">
-                    <h4 class="text-xl font-bold mb-6">Trending Topics</h4>
-                    
-                    <div class="grid grid-cols-2 gap-3 mb-8">
-                        <div class="p-4 rounded-xl text-white text-center cursor-pointer bg-brand-blue" onclick="quickSearch('Sustainability')">
-                            <div class="font-bold">Sustainability</div>
-                        </div>
-                        <div class="p-4 rounded-xl text-white text-center cursor-pointer bg-brand-teal" onclick="quickSearch('Health')">
-                            <div class="font-bold">Health</div>
-                        </div>
-                        <div class="p-4 rounded-xl text-white text-center cursor-pointer bg-brand-grey" onclick="quickSearch('Finance')">
-                            <div class="font-bold">Finance</div>
-                        </div>
-                        <div class="p-4 rounded-xl text-white text-center cursor-pointer bg-brand-amber" onclick="quickSearch('Agri-Tech')">
-                            <div class="font-bold">Agri-Tech</div>
-                        </div>
-                    </div>
+                {% endfor %}
+            </div>
+            
+            <button onclick="window.location.href=`{% url 'dataset_list' %}?sort=downloads`" class="w-full mt-6 text-brand-teal font-bold text-sm hover:underline">
+                View All Trends
+            </button>
+        </div>
+        
+        <!-- Trending Topics Tags -->
+        <div class="card-fancy p-8 flex flex-col">
+            <h4 class="text-xl font-bold mb-6">Trending Topics</h4>
+            
+            <div class="grid grid-cols-2 gap-3 mb-8">
+                <div class="p-4 rounded-xl text-white text-center cursor-pointer bg-brand-blue" onclick="quickSearch('Sustainability')">
+                    <div class="font-bold">Sustainability</div>
+                </div>
+                <div class="p-4 rounded-xl text-white text-center cursor-pointer bg-brand-teal" onclick="quickSearch('Health')">
+                    <div class="font-bold">Health</div>
+                </div>
+                <div class="p-4 rounded-xl text-white text-center cursor-pointer bg-brand-grey" onclick="quickSearch('Finance')">
+                    <div class="font-bold">Finance</div>
+                </div>
+                <div class="p-4 rounded-xl text-white text-center cursor-pointer bg-brand-amber" onclick="quickSearch('Agri-Tech')">
+                    <div class="font-bold">Agri-Tech</div>
                 </div>
             </div>
-        </section>
+        </div>
+        
+    </div>
+</section>
 
-
-<!-- Featured Datasets -->
+<!-- Dataset Catalog Section -->
 <section class="max-w-7xl mx-auto px-4 py-20">
     <div class="flex flex-col lg:flex-row gap-12">
-        <!-- Sidebar Navigation -->
+        
+        <!-- Sidebar Navigation Filters -->
         <aside class="lg:w-1/4 space-y-8">
+            <!-- Categories Card -->
             <div class="card-fancy !p-8 !bg-brand-offwhite/50 border-0">
                 <h4 class="text-xs font-bold text-brand-blue uppercase tracking-[.2em] mb-8 flex items-center">
                     <i class="fas fa-layer-group mr-3 text-brand-teal"></i> Categories
@@ -193,6 +216,7 @@
                 </ul>
             </div>
             
+            <!-- Custom Sourcing Card -->
             <div class="card-fancy !p-8 !bg-brand-blue text-white relative overflow-hidden group">
                 <div class="absolute -right-8 -top-8 opacity-10 group-hover:scale-110 transition-transform duration-1000 rotate-12">
                     <i class="fas fa-database text-[10rem]"></i>
@@ -205,8 +229,10 @@
             </div>
         </aside>
 
-        <!-- Catalog Area -->
+        <!-- Main Dataset Catalog Grid -->
         <div class="lg:w-3/4">
+            
+            <!-- Recommendations Header -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6 border-b border-gray-100 pb-8">
                 <div>
                     <h3 class="text-2xl font-bold mb-2">
@@ -229,6 +255,8 @@
                         {% endif %}
                     </p>
                 </div>
+                
+                <!-- Catalog Sort Control -->
                 <div class="bg-brand-offwhite p-1 rounded-xl flex">
                     <select onchange="sortDatasets(this.value)" class="bg-transparent border-0 text-[11px] font-bold text-gray-500 focus:ring-0 uppercase tracking-widest py-2 px-6 cursor-pointer">
                         <option value="relevance">By Relevance</option>
@@ -238,6 +266,7 @@
                 </div>
             </div>
             
+            <!-- Dataset Cards Container -->
             <div id="datasetContainer" class="grid grid-cols-1 gap-8">
                 {% for dataset in recommended_datasets %}
                 <div class="group card-fancy !p-0 overflow-hidden border-2 border-transparent hover:border-brand-teal/20 transition-all duration-300 cursor-pointer" onclick="viewDataset('{{ dataset.slug }}')">
@@ -250,7 +279,6 @@
                                  class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700">
                             <div class="absolute inset-0 bg-gradient-to-r from-gray-900/40 via-transparent to-transparent md:bg-gradient-to-t"></div>
                             
-                            <!-- Badges on Image -->
                             <div class="absolute top-4 left-4">
                                 <span class="bg-white/95 backdrop-blur-sm text-brand-blue text-[8px] font-bold px-2 py-1 rounded border border-white/20 shadow-lg uppercase tracking-wider">
                                     {{ dataset.dataset_type|default:"Data" }}
@@ -258,6 +286,7 @@
                             </div>
                         </div>
 
+                        <!-- Dataset Text Details -->
                         <div class="p-8 flex-1 flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center justify-between mb-4">
@@ -275,7 +304,8 @@
                                 <p class="text-gray-500 text-xs mb-8 leading-relaxed line-clamp-2 brand-body">{% if dataset.bio %}{{ dataset.bio }}{% else %}These datasets contain structured data optimized for research and machine learning models within the African context.{% endif %}</p>
                             </div>
 
-                            <div class="flex items-center justify-between pt-6 border-t border-gray-50 mt-auto">
+                            <!-- Metrics & View Button Row -->
+                            <div class="flex items-center justify-between pt-6 border-t border-t-gray-50 mt-auto">
                                 <div class="flex items-center space-x-6">
                                     <div class="flex flex-col">
                                         <span class="text-[8px] uppercase tracking-widest text-gray-400 font-bold mb-0.5">Reach</span>
@@ -293,6 +323,8 @@
                         </div>
                     </div>
                 </div>
+                
+                {# Fallback Empty State #}
                 {% empty %}
                 <div class="card-fancy !p-24 text-center border-dashed border-2 border-gray-200 bg-transparent flex flex-col items-center">
                     <div class="w-20 h-20 bg-brand-blue/5 rounded-full flex items-center justify-center text-brand-blue/20 text-4xl mb-6">
@@ -305,6 +337,7 @@
                 {% endfor %}
             </div>
             
+            <!-- View All Button -->
             {% if recommended_datasets %}
             <div class="mt-16 text-center">
                 <button onclick="window.location.href=`{% url 'dataset_list' %}`" class="btn-secondary !px-14 !py-4 !border-gray-200 !text-gray-500 hover:!border-brand-teal hover:!text-brand-teal hover:!bg-brand-teal/5 font-bold tracking-widest text-xs uppercase">
@@ -315,11 +348,11 @@
         </div>
     </div>
 </section>
-
 {% endblock %}
 
 {% block extra_js %}
 <script>
+  // Redirect to search URL
   function performSearch() {
     const searchInput = document.getElementById('searchInput').value;
     if (searchInput.trim()) {
@@ -327,26 +360,30 @@
     }
   }
 
+  // Pre-fill and perform search
   function quickSearch(term) {
     document.getElementById('searchInput').value = term;
     performSearch();
   }
 
+  // Filter catalog list by category
   function filterByCategory(category) {
     window.location.href = "{% url 'dataset_list' %}?category=" + encodeURIComponent(category);
   }
 
+  // Sort catalog list
   function sortDatasets(sortBy) {
     window.location.href = "{% url 'dataset_list' %}?sort=" + encodeURIComponent(sortBy);
   }
 
+  // Redirect to dataset detail view
   function viewDataset(slug) {
     if (slug) {
         window.location.href = "{% url 'dataset_detail' slug='placeholder' %}".replace('placeholder', slug);
     }
   }
 
-
+  // Numerical statistic counter scroll animation
   function animateCounters() {
     const counters = document.querySelectorAll('.animate-number');
     const observer = new IntersectionObserver((entries) => {
@@ -375,26 +412,33 @@
             }
         });
     }, { threshold: 0.5 });
+    
     counters.forEach(counter => observer.observe(counter));
   }
 
+  // Show AI recommendations pop-up message
   function showAIRecommendations() {
     alert('AI-powered recommendations are currently being calibrated for your region.');
   }
 
+  // Show contact sourcing form pop-up message
   function showContactForm() {
     alert('Our team is currently processing high demand. Form reference: #DATA-REQ-402');
   }
 
+  // Search on enter keypress
   document.getElementById('searchInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
       performSearch();
     }
   });
 
+  // Init animations on DOM load
   document.addEventListener('DOMContentLoaded', function() {
     animateCounters();
   });
 </script>
 {% endblock %}
+
+
 
