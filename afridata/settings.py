@@ -254,6 +254,17 @@ SCHEMA_REGISTRY_FILE = BASE_DIR / 'schema_registry.json'
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Celery — used by recommendations/tasks.py to refresh cached recommendations
+# asynchronously whenever a UserInteraction is saved/deleted (see signals.py).
+# Requires a running broker (default: local Redis) in any environment where
+# that signal fires; without one, saving a UserInteraction will raise a
+# connection error from the broker client.
+CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND', default='redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
 DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000
 FILE_UPLOAD_MAX_MEMORY_SIZE = 524288000
 
