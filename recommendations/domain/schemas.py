@@ -6,10 +6,18 @@ Import from here — never import from individual engine files
 to avoid circular dependencies.
 
 Types:
-    CandidateSet        — output of candidate_generation: user_id + list of item_ids
+    CandidateSet        — output of candidate_generation: user_id + candidate_ids
     ScoredCandidate     — one item with s_cf, s_cbf, and s_hybrid scores
     RankedList          — ordered list of ScoredCandidate up to Top-N
-    EngineConfig        — runtime settings: alpha, top_n, diversity_weight, candidate_pool_size
+    EngineConfig        — runtime settings for the full pipeline: hybrid fusion
+                          (alpha, item_id_to_index, item_popularities,
+                          interacted_item_ids, interaction_weights,
+                          auto_cold_start) and candidate generation / ranking
+                          (top_n, diversity_weight, candidate_pool_size,
+                          apply_popularity_filter, apply_recency_filter).
+                          This is the single canonical EngineConfig — engine
+                          modules must import it from here rather than
+                          defining their own.
 
 No Django imports, no database calls. This file must be importable in
 isolation for use in tests and management commands without a running
@@ -20,7 +28,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import List
+from typing import List, Set
 
 
 # ---------------------------------------------------------------------------
@@ -55,13 +63,25 @@ class CandidateSet:
     ----------
     user_id:
         The user for whom candidates were generated.
-    item_ids:
+    candidate_ids:
         Ordered list of dataset PKs eligible for scoring.
         Empty when the user has interacted with every available item.
+    seen_ids:
+        Dataset PKs the user has already interacted with (excluded from
+        ``candidate_ids``). Empty for cold-start / anonymous users.
+    is_cold_start:
+        True when the user has no recorded interactions at all.
+        Mirrors ``len(seen_ids) == 0`` at generation time.
+    total_pool_size:
+        Size of the full active-dataset pool before seen-item filtering
+        or capping. Informational — useful for logging/metrics.
     """
 
     user_id: int
-    item_ids: List[int] = field(default_factory=list)
+    candidate_ids: List[int] = field(default_factory=list)
+    seen_ids: Set[int] = field(default_factory=set)
+    is_cold_start: bool = False
+    total_pool_size: int = 0
 
     def __post_init__(self) -> None:
         if self.user_id <= 0:
@@ -70,12 +90,12 @@ class CandidateSet:
     @property
     def is_empty(self) -> bool:
         """True when there are no eligible candidates."""
-        return len(self.item_ids) == 0
+        return len(self.candidate_ids) == 0
 
     @property
     def size(self) -> int:
         """Number of candidate items in the pool."""
-        return len(self.item_ids)
+        return len(self.candidate_ids)
 
 
 # ---------------------------------------------------------------------------
@@ -186,6 +206,19 @@ class RankedList:
         """Number of items in this list."""
         return len(self.items)
 
+    # ------------------------------------------------------------------
+    # Convenience delegation — behave like a list where it matters
+    # ------------------------------------------------------------------
+
+    def __iter__(self):
+        return iter(self.items)
+
+    def __len__(self) -> int:
+        return len(self.items)
+
+    def __getitem__(self, index):
+        return self.items[index]
+
     @property
     def ranked_dataset_ids(self) -> List[int]:
         """Ordered list of dataset PKs, best first. Convenience for persistence layer."""
@@ -283,12 +316,46 @@ class EngineConfig:
         A non-zero value enables the popularity pre-filter in
         candidate_generation.py to keep scoring tractable at scale.
         Default: 0 (uncapped).
+    apply_popularity_filter:
+        If True, candidate_generation.py removes datasets below its
+        minimum-popularity threshold from the candidate pool.
+        Default: False.
+    apply_recency_filter:
+        If True, candidate_generation.py restricts the candidate pool
+        to the most recently active datasets.
+        Default: False.
+    item_id_to_index:
+        Mapping of dataset_id → row index in the collaborative model's
+        item factor matrix. Required by CollaborativeEngine.
+        Default: empty (treated as cold-start by the CF engine).
+    item_popularities:
+        Mapping of dataset_id → popularity count. Used by
+        ContentBasedEngine for cold-start fallback scoring, and by
+        candidate_generation.py's popularity filter/cap.
+        Default: empty.
+    interacted_item_ids:
+        Ordered list of dataset IDs the user has interacted with.
+        Used to build the CBF user profile vector.
+    interaction_weights:
+        Parallel list of weights for each interaction in
+        ``interacted_item_ids``. Use the WEIGHT_* constants from
+        content_based.py (WEIGHT_DOWNLOAD, WEIGHT_VIEW, WEIGHT_IMPLICIT).
+    auto_cold_start:
+        If True (default), the hybrid engine overrides alpha to 0.0
+        when the CF engine returns all-zero scores (cold-start user).
     """
 
     alpha: float = 0.5
     top_n: int = 10
     diversity_weight: float = 0.0
     candidate_pool_size: int = 0
+    apply_popularity_filter: bool = False
+    apply_recency_filter: bool = False
+    item_id_to_index: dict = field(default_factory=dict)
+    item_popularities: dict = field(default_factory=dict)
+    interacted_item_ids: List[int] = field(default_factory=list)
+    interaction_weights: List[float] = field(default_factory=list)
+    auto_cold_start: bool = True
 
     def __post_init__(self) -> None:
         _validate_unit_float("alpha",            self.alpha)
@@ -297,6 +364,10 @@ class EngineConfig:
         if self.candidate_pool_size < 0:
             raise ValueError(
                 f"candidate_pool_size must be >= 0, got {self.candidate_pool_size!r}"
+            )
+        if len(self.interacted_item_ids) != len(self.interaction_weights):
+            raise ValueError(
+                "interacted_item_ids and interaction_weights must have the same length."
             )
 
     @property
