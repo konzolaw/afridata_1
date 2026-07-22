@@ -19,11 +19,10 @@ All post-fusion ordering belongs in domain/ranking.py.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
 
 from recommendations.domain.engines.collaborative import CollaborativeEngine
 from recommendations.domain.engines.content_based import ContentBasedEngine
-from recommendations.domain.schemas import CandidateSet, RankedList, ScoredCandidate
+from recommendations.domain.schemas import CandidateSet, EngineConfig, RankedList, ScoredCandidate
 from recommendations.domain import ranking
 
 logger = logging.getLogger(__name__)
@@ -52,60 +51,12 @@ class HybridEngineError(RuntimeError):
 
 
 # ---------------------------------------------------------------------------
-# Configuration schema
-# ---------------------------------------------------------------------------
-
-
-@dataclass
-class EngineConfig:
-    """
-    Runtime configuration for the WeightedHybridEngine.
-
-    Attributes
-    ----------
-    alpha:
-        Blend weight for collaborative filtering scores (S_CF).
-        Must be in [0.0, 1.0].  The content-based weight is (1 - alpha).
-        Defaults to ``DEFAULT_ALPHA`` (0.5).
-    item_id_to_index:
-        Mapping of dataset_id → row index in the collaborative model's
-        item factor matrix.  Required by CollaborativeEngine.
-    item_popularities:
-        Mapping of dataset_id → popularity count.  Used by
-        ContentBasedEngine for cold-start fallback scoring.
-    interacted_item_ids:
-        Ordered list of dataset IDs the user has interacted with.
-        Used to build the CBF user profile vector.
-    interaction_weights:
-        Parallel list of weights for each interaction in
-        ``interacted_item_ids``.  Use the WEIGHT_* constants from
-        content_based.py (WEIGHT_DOWNLOAD, WEIGHT_VIEW, WEIGHT_IMPLICIT).
-    auto_cold_start:
-        If ``True`` (default), override alpha to ``COLD_START_ALPHA``
-        when the CF engine returns all-zero scores (cold-start user).
-    """
-
-    alpha: float = DEFAULT_ALPHA
-    item_id_to_index: dict[int, int] = field(default_factory=dict)
-    item_popularities: dict[int, float] = field(default_factory=dict)
-    interacted_item_ids: list[int] = field(default_factory=list)
-    interaction_weights: list[float] = field(default_factory=list)
-    auto_cold_start: bool = True
-
-    def __post_init__(self) -> None:
-        if not (0.0 <= self.alpha <= 1.0):
-            raise ValueError(
-                f"EngineConfig.alpha must be in [0.0, 1.0], got {self.alpha}."
-            )
-        if len(self.interacted_item_ids) != len(self.interaction_weights):
-            raise ValueError(
-                "interacted_item_ids and interaction_weights must have the same length."
-            )
-
-
-# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+#
+# EngineConfig is defined once, canonically, in domain/schemas.py — imported
+# above. It must not be redefined here; candidate_generation.py, hybrid.py,
+# tasks.py, and api/views.py all need to agree on the exact same shape.
 
 
 class WeightedHybridEngine:
@@ -198,7 +149,15 @@ class WeightedHybridEngine:
         }
 
         normalised = _minmax_normalise(fused)
-        return [ScoredCandidate(item_id=k, score=v) for k, v in normalised.items()]
+        return [
+            ScoredCandidate(
+                item_id=item_id,
+                s_cf=cf_scores.get(item_id, 0.0),
+                s_cbf=cbf_scores.get(item_id, 0.0),
+                s_hybrid=s_hybrid,
+            )
+            for item_id, s_hybrid in normalised.items()
+        ]
 
     def recommend(
         self,
@@ -289,9 +248,17 @@ class WeightedHybridEngine:
         )
 
         # ---- step 8: delegate ordering to ranking -----------------------
+        ranking_config = ranking.RankingConfig(
+            top_n=config.top_n,
+            diversity_weight=config.diversity_weight,
+        )
+        engine_used = "content_based" if effective_alpha == 0.0 else "hybrid"
         ranked_list: RankedList = ranking.rank(
             scored_candidates=scored_candidates,
             user_id=user_id,
+            config=ranking_config,
+            alpha=effective_alpha,
+            engine_used=engine_used,
         )
 
         logger.info(

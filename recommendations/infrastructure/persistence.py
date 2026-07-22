@@ -8,6 +8,7 @@ they call functions from here instead.
 Functions:
   get_user_interactions(user_id) -> list[UserInteraction]
   get_all_dataset_ids()          -> list[int]
+  get_item_popularities()        -> dict[int, int]
   get_all_datasets()             -> QuerySet[DatasetProxy]
   save_recommendation_result(user_id, ranked_list, alpha) -> RecommendationResult
   get_latest_recommendation(user_id) -> RecommendationResult | None
@@ -148,6 +149,23 @@ def get_all_dataset_ids() -> list[int]:
     """
     return list(
         DatasetProxy.objects.filter(is_active=True).values_list("id", flat=True)
+    )
+
+
+def get_item_popularities() -> dict[int, int]:
+    """
+    Return dataset_id → interaction_count for every active DatasetProxy.
+
+    This is the popularity signal used by ContentBasedEngine's cold-start
+    fallback and by candidate_generation.py's popularity filter/cap.
+
+    Returns
+    -------
+    dict[int, int]
+        May be empty if no datasets are synced yet.
+    """
+    return dict(
+        DatasetProxy.objects.filter(is_active=True).values_list("id", "interaction_count")
     )
 
 

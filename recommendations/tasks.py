@@ -32,8 +32,8 @@ except ImportError:
             return func
         return decorator
 
-from recommendations.domain.engines.hybrid import HybridEngine
 from recommendations.infrastructure.cache import set_cached_recommendations
+from recommendations.services import get_recommendations_for_user
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,8 @@ def refresh_user_scores(self, user_id: int) -> None:
     Recompute and cache Top-N recommendations for a single user.
 
     Called by signals when a UserInteraction is created or deleted.
-    Delegates scoring to the HybridEngine and writes the result to cache.
+    Delegates scoring to the recommendation service and writes the result
+    to cache.
 
     Args:
         user_id: Primary key of the user whose scores should be refreshed.
@@ -63,9 +64,8 @@ def refresh_user_scores(self, user_id: int) -> None:
     start = time.monotonic()
 
     try:
-        engine = HybridEngine()
-        recommendations = engine.recommend(user_id=user_id)
-        set_cached_recommendations(user_id=user_id, recommendations=recommendations)
+        ranked_list = get_recommendations_for_user(user_id=user_id)
+        set_cached_recommendations(user_id=user_id, ranked_list=ranked_list)
     except Exception as exc:
         logger.exception(
             "refresh_user_scores failed",

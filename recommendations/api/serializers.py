@@ -129,6 +129,7 @@ class FeedbackSerializer(serializers.ModelSerializer):
     """
 
     rating = serializers.IntegerField(
+        source="explicit_rating",
         required=False,
         allow_null=True,
         min_value=1,

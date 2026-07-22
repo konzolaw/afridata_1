@@ -16,9 +16,10 @@ hybrid.py must not sort or filter — it calls rank() from here.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import dataclass
 from typing import List, Optional
+
+from recommendations.domain.schemas import RankedList, ScoredCandidate
 
 logger = logging.getLogger(__name__)
 
@@ -37,83 +38,11 @@ DEFAULT_MMR_PENALTY: float = 0.5
 # ---------------------------------------------------------------------------
 # Data types
 # ---------------------------------------------------------------------------
-
-
-@dataclass(order=False)
-class ScoredCandidate:
-    """
-    A single dataset candidate with its normalised hybrid score.
-
-    Attributes
-    ----------
-    item_id:
-        Unique dataset identifier.
-    score:
-        Normalised hybrid score in [0.0, 1.0] produced by hybrid.py.
-    category:
-        Optional category label used for MMR diversity re-ranking.
-        When supplied, consecutive items from the same category are
-        penalised.  Leave as ``None`` if category information is not
-        available or diversity re-ranking is disabled.
-    """
-
-    item_id: int
-    score: float
-    category: Optional[str] = None
-
-    def __repr__(self) -> str:
-        cat = f", category={self.category!r}" if self.category else ""
-        return f"ScoredCandidate(item_id={self.item_id}, score={self.score:.4f}{cat})"
-
-
-@dataclass
-class RankedList:
-    """
-    Ordered result set returned by ``rank()``.
-
-    Wraps the sorted candidates with pipeline metadata so that callers
-    can inspect when the ranking was produced without needing a separate
-    out-of-band timestamp.
-
-    Attributes
-    ----------
-    items:
-        Ordered list of ``ScoredCandidate`` objects, highest score first.
-        Ties are broken by ``item_id`` ascending for determinism.
-    generated_at:
-        UTC datetime at which this ``RankedList`` was assembled.
-        Populated automatically; callers should not set it directly.
-
-    Notes
-    -----
-    Iteration and ``len()`` delegate to ``items`` via ``__iter__`` and
-    ``__len__``, so existing code that treats a ``RankedList`` as a plain
-    list continues to work without modification.
-    """
-
-    items: List[ScoredCandidate] = field(default_factory=list)
-    generated_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=timezone.utc)
-    )
-
-    # ------------------------------------------------------------------
-    # Convenience delegation — behave like a list where it matters
-    # ------------------------------------------------------------------
-
-    def __iter__(self):
-        return iter(self.items)
-
-    def __len__(self) -> int:
-        return len(self.items)
-
-    def __getitem__(self, index):
-        return self.items[index]
-
-    def __repr__(self) -> str:
-        return (
-            f"RankedList(n={len(self.items)}, "
-            f"generated_at={self.generated_at.isoformat()})"
-        )
+#
+# ScoredCandidate and RankedList are defined once, canonically, in
+# domain/schemas.py — imported above. They must not be redefined here;
+# hybrid.py builds ScoredCandidate objects (item_id, s_cf, s_cbf, s_hybrid)
+# and this module must operate on that exact shape, sorting by s_hybrid.
 
 
 # ---------------------------------------------------------------------------
@@ -184,10 +113,10 @@ def _sort_by_score(candidates: List[ScoredCandidate]) -> List[ScoredCandidate]:
     Returns
     -------
     list[ScoredCandidate]
-        New list sorted by ``score`` descending, ``item_id`` ascending on
-        ties.  The input list is not mutated.
+        New list sorted by ``s_hybrid`` descending, ``item_id`` ascending
+        on ties.  The input list is not mutated.
     """
-    return sorted(candidates, key=lambda c: (-c.score, c.item_id))
+    return sorted(candidates, key=lambda c: (-c.s_hybrid, c.item_id))
 
 
 def _mmr_rerank(
@@ -255,7 +184,7 @@ def _mmr_rerank(
                 )
                 else 0.0
             )
-            effective = relevance_weight * candidate.score - lambda_ * category_penalty
+            effective = relevance_weight * candidate.s_hybrid - lambda_ * category_penalty
 
             # Tie-break on item_id ascending for determinism
             if effective > best_effective or (
@@ -309,6 +238,8 @@ def rank(
     scored_candidates: List[ScoredCandidate],
     user_id: int,
     config: Optional[RankingConfig] = None,
+    alpha: float = 0.5,
+    engine_used: str = "hybrid",
 ) -> RankedList:
     """
     Order ``scored_candidates`` and return a trimmed ``RankedList``.
@@ -331,12 +262,19 @@ def rank(
     ----------
     scored_candidates:
         Unsorted list of ``ScoredCandidate`` objects produced by
-        ``hybrid._build_scored_candidates()``.
+        ``hybrid.fuse()``.
     user_id:
-        The requesting user's ID.  Used only for structured logging.
+        The requesting user's ID. Required by ``RankedList``.
     config:
         Optional ``RankingConfig``.  Defaults to ``RankingConfig()``
         (``top_n=20``, no diversity re-ranking).
+    alpha:
+        The CF/CBF blend weight actually used to produce these scores
+        (post cold-start override). Stored on the returned RankedList
+        for auditability.
+    engine_used:
+        Which engine path produced the list. Stored on the returned
+        RankedList. Defaults to "hybrid".
 
     Returns
     -------
@@ -348,9 +286,9 @@ def rank(
     Examples
     --------
     >>> candidates = [
-    ...     ScoredCandidate(item_id=1, score=0.9, category="geo"),
-    ...     ScoredCandidate(item_id=2, score=0.85, category="geo"),
-    ...     ScoredCandidate(item_id=3, score=0.8, category="health"),
+    ...     ScoredCandidate(item_id=1, s_cf=0.9, s_cbf=0.9, s_hybrid=0.9, category="geo"),
+    ...     ScoredCandidate(item_id=2, s_cf=0.85, s_cbf=0.85, s_hybrid=0.85, category="geo"),
+    ...     ScoredCandidate(item_id=3, s_cf=0.8, s_cbf=0.8, s_hybrid=0.8, category="health"),
     ... ]
     >>> result = rank(candidates, user_id=42)
     >>> [c.item_id for c in result]
@@ -368,8 +306,8 @@ def rank(
     Tie-breaking:
 
     >>> tied = [
-    ...     ScoredCandidate(item_id=5, score=0.7),
-    ...     ScoredCandidate(item_id=2, score=0.7),
+    ...     ScoredCandidate(item_id=5, s_cf=0.7, s_cbf=0.7, s_hybrid=0.7),
+    ...     ScoredCandidate(item_id=2, s_cf=0.7, s_cbf=0.7, s_hybrid=0.7),
     ... ]
     >>> [c.item_id for c in rank(tied, user_id=1)]
     [2, 5]  # lower item_id wins on equal score
@@ -379,7 +317,7 @@ def rank(
 
     if not scored_candidates:
         logger.debug("ranking.rank: empty candidate list for user_id=%d", user_id)
-        return RankedList()
+        return RankedList(user_id=user_id, alpha=alpha, engine_used=engine_used)
 
     logger.debug(
         "ranking.rank: user_id=%d, n_candidates=%d, top_n=%s, diversity_weight=%.3f",
@@ -408,7 +346,7 @@ def rank(
     ordered = _apply_top_n(ordered, config.top_n)
 
     # --- step 5: wrap with metadata and return ---------------------------
-    result = RankedList(items=ordered)
+    result = RankedList(user_id=user_id, items=ordered, alpha=alpha, engine_used=engine_used)
 
     logger.info(
         "ranking.rank: user_id=%d → returning %d ranked items (generated_at=%s)",

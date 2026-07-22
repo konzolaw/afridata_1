@@ -21,6 +21,6 @@ from .views import RecommendationListView, FeedbackView
 app_name = 'recommendations'
 
 urlpatterns = [
-    path('recommendations/', RecommendationListView.as_view(), name='list'),
-    path('recommendations/feedback/', FeedbackView.as_view(), name='feedback'),
+    path('', RecommendationListView.as_view(), name='list'),
+    path('feedback/', FeedbackView.as_view(), name='feedback'),
 ]
