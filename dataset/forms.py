@@ -1,4 +1,5 @@
 # dataset/forms.py
+import hashlib
 from django import forms
 from .models import Dataset
 
@@ -134,67 +135,23 @@ class DatasetUploadForm(forms.ModelForm):
     def clean_file(self):
         file = self.cleaned_data.get('file')
         if not file:
-            raise forms.ValidationError('Please select a file to upload')
-            
-        # Check file size (limit to 10MB)
-        max_size = 10 * 1024 * 1024  # 10MB
-        if file.size > max_size:
-            raise forms.ValidationError('File size cannot exceed 10MB')
-        
-        # Check file extension
-        allowed_extensions = ['.csv', '.xlsx', '.xls', '.pdf', '.txt', '.json', '.xml', '.zip', '.yaml', '.yml', '.parquet', '.bin', '.dat', '.pt', '.pkl', '.h5', '.safetensors', '.onnx', '.joblib']
-        file_extension = '.' + file.name.lower().split('.')[-1]
-        if file_extension not in allowed_extensions:
-            raise forms.ValidationError(
-                f'Only these file types are allowed: {", ".join(allowed_extensions)}'
-            )
-            
-        # --- Security Validation Pipeline ---
-        import filetype
-        import tempfile
-        import os
-        from picklescan.scanner import scan_file_path
+            return file
 
-        # 1. Magic Number Check to prevent executable disguising
-        try:
-            chunk = file.read(2048)
-            file.seek(0)
-            kind = filetype.guess(chunk)
-            
-            # If we detect dangerous executable mime types, immediately reject
-            if kind and kind.mime in ['application/x-msdownload', 'application/x-executable', 'application/x-sh', 'application/x-mach-binary']:
-                raise forms.ValidationError("Security Error: Executable files are strictly prohibited.")
-        except Exception as e:
-            if isinstance(e, forms.ValidationError):
-                raise e
-            pass # Non-fatal if filetype module fails to guess
-            
-        # 2. ML Tensor Vulnerability Scan (Picklescan)
-        if file_extension in ['.pkl', '.pt']:
-            try:
-                # Write to temp file because picklescan requires a file path
-                with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as tmp:
-                    for c in file.chunks():
-                        tmp.write(c)
-                    tmp_path = tmp.name
-                
-                scan_result = scan_file_path(tmp_path)
-                os.unlink(tmp_path)
-                
-                if scan_result.issues_count > 0:
-                    raise forms.ValidationError(
-                        f"Security Error: Malicious or unsafe code detected in this {file_extension} file. "
-                        f"Please convert to .safetensors and try again."
-                    )
-            except Exception as e:
-                # Reset file pointer if temp file writing failed midway
-                file.seek(0)
-                if isinstance(e, forms.ValidationError):
-                    raise e
-                raise forms.ValidationError(f"Security Error: Unable to verify the safety of this {file_extension} file.")
-            
-        file.seek(0) # Always reset file pointer before returning
-        
+        # --- Duplicate Check using SHA-256 Hashing ---
+        hasher = hashlib.sha256()
+        for chunk in file.chunks(chunk_size=65536):
+            hasher.update(chunk)
+        file_hash = hasher.hexdigest()
+
+        # Check if hash already exists in database
+        if Dataset.objects.filter(file_hash=file_hash).exists():
+            raise forms.ValidationError(
+                "This exact file has already been uploaded to AfriData!"
+            )
+
+        # Attach hash to the file object so views.py can save it
+        file.file_hash = file_hash
+
         return file
     
     def clean_dataset_type(self):
@@ -233,6 +190,24 @@ class DatasetUploadForm(forms.ModelForm):
         
         return cleaned_data
 
+        file = self.cleaned_data.get('file')
+        if file:
+            # Calculate SHA-256 hash in 64KB chunks
+            hasher = hashlib.sha256()
+            for chunk in file.chunks(chunk_size=65536):
+                hasher.update(chunk)
+            file_hash = hasher.hexdigest()
+
+            # Check if this hash already exists in db.sqlite3
+            if Dataset.objects.filter(file_hash=file_hash).exists():
+                raise forms.ValidationError(
+                    "This exact file has already been uploaded to AfriData!"
+                )
+
+            # Attach hash to the file object for the view
+            file.file_hash = file_hash
+
+        return file
 class DatasetEditForm(DatasetUploadForm):
     class Meta(DatasetUploadForm.Meta):
         fields = ['title', 'cover_photo', 'dataset_type', 'bio', 'topics', 'original_author', 'data_source', 'collection_date', 'language', 'dataset_license', 'update_frequency', 'geographic_coverage', 'temporal_coverage', 'usage_notes']

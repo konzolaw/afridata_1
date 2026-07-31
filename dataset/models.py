@@ -37,6 +37,7 @@ class Dataset(models.Model):
 
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='authored_datasets')
     file = models.FileField(upload_to='datasets/', db_column='file_path')
+    file_hash = models.CharField(max_length=64, blank=True, null=True, db_index=True)
     dataset_type = models.CharField(max_length=20, choices=DATASET_TYPES, db_column='file_type')
     bio = models.TextField()
     cover_photo = models.ImageField(upload_to='dataset_covers/', null=True, blank=True, help_text="Relevant cover photo for the dataset")
