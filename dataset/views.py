@@ -511,7 +511,13 @@ def upload_dataset(request):
         if form.is_valid():
             dataset = form.save(commit=False)
             dataset.author = request.user
-            
+
+            # ==================== ADDED FOR HASHING ====================
+            uploaded_file = form.cleaned_data.get('file')
+            if uploaded_file and hasattr(uploaded_file, 'file_hash'):
+                dataset.file_hash = uploaded_file.file_hash
+            # ==========================================================
+
             # Calculate token cost based on file size
             # Calculate token cost based on file size
             dataset.token_cost = dataset.calculate_token_cost()
