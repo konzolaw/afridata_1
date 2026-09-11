@@ -3,125 +3,119 @@
 
 {# Browser Tab Title #}
 {% block title %}
-    {% if user.is_authenticated %}
-        AfriData - {{ page_title|default:"Welcome" }}
-    {% else %}
-        AfriData - Browse African Datasets
-    {% endif %}
+{% if user.is_authenticated %}
+AfriData - {{ page_title|default:"Welcome" }}
+{% else %}
+AfriData - Browse African Datasets
+{% endif %}
 {% endblock %}
 
 {# Header Styling #}
-{% block header_class %}gradient-header{% endblock %}
+{% block header_class %}bg-[#f5f8f5] text-gray-900{% endblock %}
 
 {# Hero Block #}
 {% block header_content %}
-<div class="relative min-h-[500px] flex items-center justify-center py-20 px-4">
-    <!-- Visual background effects -->
-    <div class="absolute inset-0 z-0 overflow-hidden">
-        <div class="absolute top-[-10%] right-[-10%] w-[50%] h-[60%] bg-brand-teal/20 blur-[120px] rounded-full"></div>
-        <div class="absolute bottom-[-10%] left-[-10%] w-[40%] h-[50%] bg-brand-blue/30 blur-[100px] rounded-full"></div>
-        <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
-            <i class="fas fa-globe-africa text-[40rem] rotate-12"></i>
-        </div>
+<div class="relative min-h-[550px] flex items-center py-16 md:py-20 px-4 md:px-8 bg-[#f5f8f5] overflow-hidden">
+    <!-- Decorative background elements -->
+    <div class="absolute inset-0 z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-[40%] h-[100%] bg-[#e2ebe2]/30 rounded-bl-[100px]"></div>
+        <div class="absolute bottom-[-20%] left-[-10%] w-[35%] h-[50%] bg-[#f0f4f0]/60 blur-[80px] rounded-full"></div>
     </div>
 
     <div class="max-w-7xl mx-auto relative z-10 w-full">
-        <div class="max-w-4xl mx-auto text-center">
-            {% if user.is_authenticated %}
-                <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight !text-white leading-tight font-caslon">
-                    Welcome back, <span class="text-brand-teal">{% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %}</span>
-                </h1>
-                <p class="text-xl md:text-2xl mb-12 text-white/80 font-light max-w-2xl mx-auto leading-relaxed">
-                    Manage your research and browse the latest African datasets.
-                </p>
-                
-                <!-- Dashboard Shortcuts -->
-                <div class="flex flex-wrap justify-center gap-4 mb-14">
-                    <a href="{% url 'upload_dataset' %}" class="btn-primary !bg-white !text-brand-blue !border-0 hover:!bg-brand-offwhite shadow-xl transition-transform hover:-translate-y-1 no-underline flex items-center justify-center">
-                        <i class="fas fa-cloud-upload-alt mr-2 text-brand-teal"></i>Upload New Dataset
-                    </a>
-                    <a href="{% url 'dataset_list' %}" class="btn-secondary !text-white !border-white/20 hover:!bg-white/10 shadow-lg backdrop-blur-sm no-underline flex items-center justify-center">
-                        Browse Library
-                    </a>
-                    <a href="{% url 'workspace' %}" class="btn-secondary !text-white !border-white/20 hover:!bg-white/10 shadow-lg backdrop-blur-sm no-underline flex items-center justify-center">
-                        My Workspace
-                    </a>
-                </div>
-            {% else %}
-                <h1 class="text-5xl md:text-7xl font-bold mb-8 tracking-tight !text-white leading-[1.1] font-caslon">
-                    African <span class="text-brand-teal">Datasets</span>
-                </h1>
-                <p class="text-xl md:text-2xl mb-12 text-white/80 font-light max-w-2xl mx-auto leading-relaxed">
-                    Connecting researchers with high-quality data from across Africa.
-                </p>
-                
-                <div class="flex flex-wrap justify-center gap-4 mb-14">
-                    <a href="{% url 'login_signup' %}?mode=signup" class="btn-primary !bg-brand-teal !border-0 !px-10 py-4 text-lg shadow-xl no-underline flex items-center justify-center">
-                        Sign Up
-                    </a>
-                    <a href="{% url 'dataset_list' %}" class="btn-secondary !text-white !border-white/20 hover:!bg-white/10 !px-10 py-4 text-lg no-underline flex items-center justify-center">
-                        View Datasets
-                    </a>
-                </div>
-            {% endif %}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
 
-            <!-- Search Bar -->
-            <div class="max-w-4xl mx-auto">
-                <div class="relative group">
-                    <div class="absolute inset-0 bg-white/5 backdrop-blur-md rounded-2xl p-4 -m-4 opacity-0 group-focus-within:opacity-100 transition-all duration-500"></div>
-                    <div class="relative flex flex-col md:flex-row items-center bg-white rounded-2xl shadow-2xl overflow-hidden p-2 md:p-1 border border-white/20 gap-2 md:gap-0">
-                        <div class="hidden md:block pl-6 text-gray-400">
-                            <i class="fas fa-search text-lg"></i>
+            <!-- Left Column: Content -->
+            <div class="lg:col-span-6 flex flex-col justify-center">
+                {% if user.is_authenticated %}
+                <div class="text-[13px] md:text-sm font-semibold tracking-wider text-gray-500 mb-2 uppercase text-left font-mono">
+                    Welcome back, <span class="text-[#005c3e] font-bold">{{ user.get_short_name }}</span>
+                </div>
+                {% endif %}
+
+                <h1
+                    class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight text-[#000000] leading-none font-caslon text-left">
+                    African Data<br>
+                    <span class="text-[#005c3e] italic font-normal">Library</span>
+                </h1>
+
+                <p class="text-base md:text-lg mb-8 text-gray-600 font-light max-w-xl text-left leading-relaxed">
+                    Access verified datasets for research and analysis across the continent. Bridging the gap between
+                    historical data and future digital insights.
+                </p>
+
+                <!-- Hero Action Buttons -->
+                <div class="flex flex-wrap gap-4 mb-10">
+                    <a href="{% url 'dataset_list' %}"
+                        class="bg-[#005c3e] hover:bg-[#004730] text-white px-8 py-3.5 rounded-lg font-semibold transition-all shadow-md no-underline text-center">
+                        Browse Datasets
+                    </a>
+                    <a href="{% url 'upload_dataset' %}"
+                        class="border border-gray-300 text-gray-800 bg-white hover:bg-gray-50 px-8 py-3.5 rounded-lg font-semibold transition-all shadow-sm no-underline text-center">
+                        Contribute Data
+                    </a>
+                </div>
+
+                <!-- Search Container -->
+                <div class="max-w-xl w-full">
+                    <div class="relative group">
+                        <div
+                            class="absolute inset-0 bg-[#e2ebe2]/40 rounded-xl p-2 -m-2 opacity-0 group-focus-within:opacity-100 transition-all duration-300">
                         </div>
-                        <input id="searchInput" type="text" 
-                               placeholder="Search markets, demographics, or climate trends..." 
-                               class="w-full pl-4 md:pl-4 pr-4 py-3 md:py-5 text-gray-900 text-base md:text-lg border-none focus:ring-0 focus:outline-none placeholder:text-gray-400" />
-                        <button onclick="performSearch()" class="btn-primary w-full md:w-auto !py-3 md:!py-4 !px-6 md:!px-10 !rounded-xl !shadow-none">
-                             Search
-                        </button>
+                        <div
+                            class="relative flex items-center bg-white rounded-xl shadow-md overflow-hidden p-1.5 border border-gray-200">
+                            <div class="pl-4 text-gray-400">
+                                <i class="fas fa-search text-base"></i>
+                            </div>
+                            <input id="searchInput" type="text"
+                                placeholder="Search datasets, topics, countries, or sectors..."
+                                class="w-full pl-3 pr-4 py-2.5 text-gray-900 text-base border-none focus:ring-0 focus:outline-none placeholder:text-gray-400" />
+                            <button onclick="performSearch()"
+                                class="bg-[#005c3e] hover:bg-[#004730] text-white py-2.5 px-6 rounded-lg font-semibold shadow-none transition-colors border-0">
+                                Search
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Popular Keywords / Tags -->
+                    <div class="mt-4 flex flex-wrap gap-2 items-center text-xs text-gray-500 font-medium">
+                        <span
+                            class="text-gray-400 uppercase tracking-wider text-[10px] font-bold font-mono">Popular:</span>
+                        <button onclick="quickSearch('Health Systems')"
+                            class="bg-[#e2ebe2]/60 hover:bg-[#d4e4d4] text-gray-700 rounded px-2.5 py-1 text-xs border border-gray-200/50 transition-colors font-mono">Health
+                            Systems</button>
+                        <button onclick="quickSearch('Renewable Energy')"
+                            class="bg-[#e2ebe2]/60 hover:bg-[#d4e4d4] text-gray-700 rounded px-2.5 py-1 text-xs border border-gray-200/50 transition-colors font-mono">Renewable
+                            Energy</button>
+                        <button onclick="quickSearch('Fintech Metrics')"
+                            class="bg-[#e2ebe2]/60 hover:bg-[#d4e4d4] text-gray-700 rounded px-2.5 py-1 text-xs border border-gray-200/50 transition-colors font-mono">Fintech
+                            Metrics</button>
+                        <button onclick="quickSearch('Agriculture')"
+                            class="bg-[#e2ebe2]/60 hover:bg-[#d4e4d4] text-gray-700 rounded px-2.5 py-1 text-xs border border-gray-200/50 transition-colors font-mono">Agriculture</button>
                     </div>
                 </div>
-                <!-- Popular Keywords -->
-                <div class="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-white/60 font-medium">
-                    <span class="text-white/40 uppercase tracking-tighter text-xs flex items-center">Trending:</span>
-                    <button onclick="quickSearch('Agriculture')" class="hover:text-brand-teal transition-colors">Agriculture</button>
-                    <button onclick="quickSearch('Macroeconomics')" class="hover:text-brand-teal transition-colors">Macroeconomics</button>
-                    <button onclick="quickSearch('Healthcare')" class="hover:text-brand-teal transition-colors">Healthcare</button>
-                    <button onclick="quickSearch('Technology')" class="hover:text-brand-teal transition-colors">Technology</button>
+            </div>
+
+            <!-- Right Column: Visual Frame and Image -->
+            <div class="lg:col-span-6 flex justify-center lg:justify-end relative w-full">
+                <!-- Background decorative rectangles to match mockup -->
+                <div
+                    class="absolute top-[8%] right-[-6%] w-[90%] h-[84%] bg-[#f1eedc]/60 rounded-xl z-0 transform rotate-1">
+                </div>
+                <div
+                    class="absolute bottom-[-6%] left-[6%] w-[84%] h-[90%] bg-[#e3ded0]/50 rounded-xl z-0 transform -rotate-1">
+                </div>
+
+                <!-- Main Framed Container -->
+                <div
+                    class="relative bg-white p-3 rounded-xl border border-gray-200/70 shadow-2xl z-10 w-full max-w-full transition-transform duration-500 hover:scale-[1.02]">
+                    <div class="overflow-hidden rounded-lg bg-[#faf9f6]">
+                        <img src="{% static 'images/simple_africa.png' %}" alt="African Data Library Map View"
+                            class="w-full h-auto object-contain max-h-[480px] block" />
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
-<!-- Stats Counter Ribbon -->
-<div class="relative z-20 -mt-10 px-4">
-    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-2xl border border-gray-100 p-8 md:p-10">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 items-center">
-            
-            <!-- Datasets Count -->
-            <div class="text-center border-r-0 md:border-r border-gray-100">
-                <div class="text-4xl font-bold text-brand-blue mb-1 tabular-nums animate-number" data-target="{{ total_datasets|default:'15000' }}">{{ total_datasets|default:"15,000" }}</div>
-                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Datasets</div>
-            </div>
-            
-            <!-- Countries Count -->
-            <div class="text-center border-r-0 md:border-r border-gray-100">
-                <div class="text-4xl font-bold text-brand-blue mb-1 tabular-nums animate-number" data-target="{{ total_countries|default:'54' }}">{{ total_countries|default:"54" }}</div>
-                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Countries</div>
-            </div>
-            
-            <!-- Downloads Count -->
-            <div class="text-center border-r-0 md:border-r border-gray-100">
-                <div class="text-4xl font-bold text-brand-blue mb-1 tabular-nums animate-number" data-target="{{ total_downloads|default:'250000' }}">{{ total_downloads|default:"250K" }}+</div>
-                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Downloads</div>
-            </div>
-            
-            <!-- Researchers Count -->
-            <div class="text-center">
-                <div class="text-4xl font-bold text-brand-blue mb-1 tabular-nums animate-number" data-target="{{ total_researchers|default:'5000' }}">{{ total_researchers|default:"5,000" }}+</div>
-                <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Researchers</div>
-            </div>
         </div>
     </div>
 </div>
@@ -129,21 +123,53 @@
 
 {# Core Content Block #}
 {% block content %}
+<!-- Stats Counter Ribbon -->
+<div class="py-12 bg-[#FFE088] border-b border-[#ffd76b]">
+    <div class="max-w-7xl mx-auto px-4 md:px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 items-center">
+            
+            <!-- Datasets Count -->
+            <div class="text-center border-r-0 md:border-r border-[#0f3d2e]/10">
+                <div class="text-4xl font-bold text-[#0f3d2e] mb-1 tabular-nums animate-number font-caslon" data-target="{{ total_datasets|default:'15000' }}">{{ total_datasets|default:"15,000" }}</div>
+                <div class="text-xs font-bold text-[#0f3d2e]/70 uppercase tracking-widest font-mono">Datasets</div>
+            </div>
+            
+            <!-- Countries Count -->
+            <div class="text-center border-r-0 md:border-r border-[#0f3d2e]/10">
+                <div class="text-4xl font-bold text-[#0f3d2e] mb-1 tabular-nums animate-number font-caslon" data-target="{{ total_countries|default:'54' }}">{{ total_countries|default:"54" }}</div>
+                <div class="text-xs font-bold text-[#0f3d2e]/70 uppercase tracking-widest font-mono">Countries</div>
+            </div>
+            
+            <!-- Downloads Count -->
+            <div class="text-center border-r-0 md:border-r border-[#0f3d2e]/10">
+                <div class="text-4xl font-bold text-[#0f3d2e] mb-1 tabular-nums animate-number font-caslon" data-target="{{ total_downloads|default:'250000' }}">{{ total_downloads|default:"250K" }}+</div>
+                <div class="text-xs font-bold text-[#0f3d2e]/70 uppercase tracking-widest font-mono">Downloads</div>
+            </div>
+            
+            <!-- Researchers Count -->
+            <div class="text-center">
+                <div class="text-4xl font-bold text-[#0f3d2e] mb-1 tabular-nums animate-number font-caslon" data-target="{{ total_researchers|default:'5000' }}">{{ total_researchers|default:"5,000" }}+</div>
+                <div class="text-xs font-bold text-[#0f3d2e]/70 uppercase tracking-widest font-mono">Researchers</div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% if user.is_authenticated %}
 
 <!-- User Dashboard Sections -->
 <section class="max-w-7xl mx-auto px-4 py-8">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-        
+
         <!-- Recent Token Activity -->
         <div class="card-fancy">
             <div class="flex items-center justify-between mb-4">
                 <h4 class="text-xl font-semibold flex items-center">
-                     Recent Token Activity
+                    Recent Token Activity
                 </h4>
                 <a href="/tokens/history/" class="text-brand-teal text-sm hover:underline">View All</a>
             </div>
-            
+
             <div class="space-y-3">
                 {% for transaction in recent_transactions %}
                 <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
@@ -152,8 +178,10 @@
                         <div class="text-xs text-gray-500">{{ transaction.created_at|timesince }} ago</div>
                     </div>
                     <div class="text-right">
-                        <div class="font-bold {% if transaction.transaction_type == 'earned' %}text-green-600{% else %}text-red-600{% endif %}">
-                            {% if transaction.transaction_type == 'earned' %}+{% else %}-{% endif %}{{ transaction.amount|floatformat:0 }}
+                        <div
+                            class="font-bold {% if transaction.transaction_type == 'earned' %}text-green-600{% else %}text-red-600{% endif %}">
+                            {% if transaction.transaction_type == 'earned' %}+{% else %}-{% endif %}{{
+                            transaction.amount|floatformat:0 }}
                         </div>
                     </div>
                 </div>
@@ -164,19 +192,20 @@
                 {% endfor %}
             </div>
         </div>
-        
+
         <!-- User's Datasets -->
         <div class="card-fancy">
             <div class="flex items-center justify-between mb-4">
                 <h4 class="text-xl font-semibold flex items-center">
-                     Your Datasets
+                    Your Datasets
                 </h4>
                 <a href="/datasets/my-datasets/" class="text-brand-teal text-sm hover:underline">Manage All</a>
             </div>
-            
+
             <div class="space-y-3">
                 {% for dataset in user_datasets %}
-                <a href="{% url 'dataset_detail' dataset.slug %}" class="block py-2 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors no-underline">
+                <a href="{% url 'dataset_detail' dataset.slug %}"
+                    class="block py-2 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors no-underline">
                     <div class="font-medium text-sm text-brand-blue">{{ dataset.title|truncatechars:30 }}</div>
                     <div class="flex justify-between text-xs text-gray-500 mt-1">
                         <span>{{ dataset.downloads }} downloads</span>
@@ -186,16 +215,18 @@
                 {% empty %}
                 <div class="text-center py-4 text-gray-500">
                     <p>You haven't uploaded any datasets yet</p>
-                    <a href="{% url 'upload_dataset' %}" class="mt-2 text-blue-600 text-sm hover:text-blue-800 no-underline inline-block">Upload Your First Dataset</a>
+                    <a href="{% url 'upload_dataset' %}"
+                        class="mt-2 text-blue-600 text-sm hover:text-blue-800 no-underline inline-block">Upload Your
+                        First Dataset</a>
                 </div>
                 {% endfor %}
             </div>
         </div>
-        
+
         <!-- Referral Program Card -->
         <div class="bg-gradient-to-br from-brand-blue to-brand-teal rounded-brand-card shadow-lg p-6 text-white">
             <h4 class="text-xl font-semibold mb-4 flex items-center !text-white">
-                 Referral Program
+                Referral Program
             </h4>
             <div class="mb-4">
                 <div class="text-2xl font-bold">{{ referrals_count }}</div>
@@ -205,7 +236,8 @@
                 <div class="text-xs opacity-90 mb-1">Your Referral Code:</div>
                 <div class="font-mono text-sm">{{ referral_code }}</div>
             </div>
-            <button onclick="copyReferralCode()" class="w-full bg-white text-brand-blue py-2 rounded-brand-btn text-sm font-semibold hover:bg-brand-offwhite transition-colors">
+            <button onclick="copyReferralCode()"
+                class="w-full bg-white text-brand-blue py-2 rounded-brand-btn text-sm font-semibold hover:bg-brand-offwhite transition-colors">
                 Share & Earn Tokens
             </button>
         </div>
@@ -219,21 +251,21 @@
         <span class="text-brand-teal font-bold uppercase tracking-widest text-xs mb-3 block">Marketplace Insights</span>
         <h2 class="text-3xl md:text-4xl font-bold mb-4">
             {% if user.is_authenticated %}
-                Recommended for You
+            Recommended for You
             {% else %}
-                What's Trending Across Africa
+            What's Trending Across Africa
             {% endif %}
         </h2>
         <div class="w-20 h-1.5 bg-brand-teal mx-auto mb-6 rounded-full"></div>
         <p class="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
             {% if user.is_authenticated %}
-                Intelligent recommendations based on your research patterns and interests.
+            Intelligent recommendations based on your research patterns and interests.
             {% else %}
-                Stay informed with the most popular datasets and emerging research topics.
+            Stay informed with the most popular datasets and emerging research topics.
             {% endif %}
         </p>
     </div>
-    
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <!-- Trending Datasets -->
         <div class="card-fancy !p-0 overflow-hidden flex flex-col">
@@ -241,31 +273,43 @@
                 <div>
                     <h4 class="text-xl font-bold flex items-center mb-1">
                         Trending Datasets
-                        <span class="pulse-dot ml-3 w-2.5 h-2.5 bg-brand-green rounded-full shadow-[0_0_8px_#7BC67B]"></span>
+                        <span
+                            class="pulse-dot ml-3 w-2.5 h-2.5 bg-brand-green rounded-full shadow-[0_0_8px_#7BC67B]"></span>
                     </h4>
                     <p class="text-sm text-gray-500">Fastest growing repositories</p>
                 </div>
-                <span class="text-xs font-semibold text-brand-teal bg-brand-teal/10 px-3 py-1 rounded-full uppercase tracking-tighter">Live data</span>
+                <span
+                    class="text-xs font-semibold text-brand-teal bg-brand-teal/10 px-3 py-1 rounded-full uppercase tracking-tighter">Live
+                    data</span>
             </div>
-            
+
             <div class="p-4 space-y-4 flex-1">
                 {% for dataset in trending_datasets %}
-                <a href="{% url 'dataset_detail' dataset.slug %}" class="group relative p-5 rounded-brand-card hover:bg-brand-offwhite transition-all duration-300 border border-transparent hover:border-gray-200 cursor-pointer flex gap-4 no-underline text-inherit">
+                <a href="{% url 'dataset_detail' dataset.slug %}"
+                    class="group relative p-5 rounded-brand-card hover:bg-brand-offwhite transition-all duration-300 border border-transparent hover:border-gray-200 cursor-pointer flex gap-4 no-underline text-inherit">
                     <div class="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-gray-100 hidden sm:block">
-                        <img src="{{ dataset.get_cover_photo_url }}" alt="Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                        <img src="{{ dataset.get_cover_photo_url }}" alt="Cover"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform">
                     </div>
                     <div class="flex-1">
                         <div class="flex justify-between items-start mb-3">
-                            <h5 class="font-bold text-lg group-hover:text-brand-blue transition-colors line-clamp-1 pr-6">{{ dataset.title }}</h5>
-                            <span class="shrink-0 bg-brand-offwhite group-hover:bg-brand-teal group-hover:text-white text-brand-teal text-[10px] font-bold px-2 py-1 rounded transition-colors uppercase tracking-widest">
+                            <h5
+                                class="font-bold text-lg group-hover:text-brand-blue transition-colors line-clamp-1 pr-6">
+                                {{ dataset.title }}</h5>
+                            <span
+                                class="shrink-0 bg-brand-offwhite group-hover:bg-brand-teal group-hover:text-white text-brand-teal text-[10px] font-bold px-2 py-1 rounded transition-colors uppercase tracking-widest">
                                 {{ dataset.get_dataset_type_display|default:"Data" }}
                             </span>
                         </div>
-                        <p class="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">{{ dataset.bio|default:"Comprehensive dataset for research and analysis." }}</p>
-                        <div class="flex justify-between items-center text-xs text-gray-400 border-t border-gray-100 pt-3">
+                        <p class="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">{{
+                            dataset.bio|default:"Comprehensive dataset for research and analysis." }}</p>
+                        <div
+                            class="flex justify-between items-center text-xs text-gray-400 border-t border-gray-100 pt-3">
                             <div class="flex space-x-4">
-                                <span class="flex items-center"><i class="far fa-eye mr-2 text-brand-teal"></i> {{ dataset.views }}</span>
-                                <span class="flex items-center"><i class="fas fa-download mr-2 text-brand-teal"></i> {{ dataset.downloads }}</span>
+                                <span class="flex items-center"><i class="far fa-eye mr-2 text-brand-teal"></i> {{
+                                    dataset.views }}</span>
+                                <span class="flex items-center"><i class="fas fa-download mr-2 text-brand-teal"></i> {{
+                                    dataset.downloads }}</span>
                             </div>
                             <span class="text-brand-green font-bold flex items-center">
                                 <i class="fas fa-chart-line mr-1"></i> Highly active
@@ -279,33 +323,37 @@
                 </div>
                 {% endfor %}
             </div>
-            
+
             <div class="p-6 bg-gray-50/50 border-t border-gray-100">
-                <a href="{% url 'dataset_list' %}?sort=downloads" class="btn-secondary w-full group !bg-white text-center block no-underline">
+                <a href="{% url 'dataset_list' %}?sort=downloads"
+                    class="btn-secondary w-full group !bg-white text-center block no-underline">
                     View Catalog <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                 </a>
             </div>
         </div>
-        
+
         <!-- Trending Topics -->
         <div class="card-fancy !p-0 overflow-hidden flex flex-col">
             <div class="p-8 border-b border-gray-100 bg-gray-50/50">
                 <h4 class="text-xl font-bold mb-1">Trending Topics</h4>
                 <p class="text-sm text-gray-500">Most active research categories</p>
             </div>
-            
+
             <div class="p-8 flex-1">
                 <div class="grid grid-cols-2 gap-4 mb-10">
                     {% for category, count in top_categories|slice:":4" %}
                     <div class="topic-tag group relative overflow-hidden p-6 rounded-brand-card text-white text-center cursor-pointer transition-all duration-500 hover:-translate-y-1 shadow-md hover:shadow-xl topic-card-{{ forloop.counter0|default:'0' }}"
-                         onclick="filterByCategory('{{ category }}')">
-                        <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-150 transition-transform duration-1000">
+                        onclick="filterByCategory('{{ category }}')">
+                        <div
+                            class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-150 transition-transform duration-1000">
                             <i class="fas fa-network-wired text-7xl"></i>
                         </div>
                         <div class="relative z-10">
-                            <div class="text-sm uppercase tracking-widest opacity-80 mb-2">Topic #{{ forloop.counter }}</div>
+                            <div class="text-sm uppercase tracking-widest opacity-80 mb-2">Topic #{{ forloop.counter }}
+                            </div>
                             <div class="text-xl font-bold leading-tight">{{ category|title }}</div>
-                            <div class="text-[10px] font-bold mt-3 bg-white/20 inline-block px-3 py-1 rounded-full">{{ count }} Datasets</div>
+                            <div class="text-[10px] font-bold mt-3 bg-white/20 inline-block px-3 py-1 rounded-full">{{
+                                count }} Datasets</div>
                         </div>
                     </div>
                     {% empty %}
@@ -314,33 +362,39 @@
                     </div>
                     {% endfor %}
                 </div>
-                
+
                 <!-- Popular Searches -->
                 <div class="space-y-6">
                     <h5 class="text-sm font-bold text-brand-blue uppercase tracking-widest mb-4">Popular Searches</h5>
                     <div class="flex flex-wrap gap-2">
                         {% for term in popular_terms %}
-                        <span onclick="quickSearch('{{ term }}')" class="bg-brand-offwhite text-brand-blue px-4 py-2 rounded-full text-xs font-semibold hover:bg-brand-teal hover:text-white transition-all cursor-pointer border border-gray-200 hover:border-transparent">{{ term }}</span>
+                        <span onclick="quickSearch('{{ term }}')"
+                            class="bg-brand-offwhite text-brand-blue px-4 py-2 rounded-full text-xs font-semibold hover:bg-brand-teal hover:text-white transition-all cursor-pointer border border-gray-200 hover:border-transparent">{{
+                            term }}</span>
                         {% empty %}
                         <p class="text-xs text-gray-400 font-medium">Climate Data • Demographics • Education • Trade</p>
                         {% endfor %}
                     </div>
                 </div>
             </div>
-            
+
             <!-- AI Recommendation Promo Banner -->
             <div class="p-6 bg-brand-blue/5 border-t border-gray-100">
-                <div class="flex items-center justify-between space-x-6 p-4 rounded-brand-card bg-white shadow-sm border border-brand-teal/20">
+                <div
+                    class="flex items-center justify-between space-x-6 p-4 rounded-brand-card bg-white shadow-sm border border-brand-teal/20">
                     <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-gradient-to-br from-brand-blue to-brand-teal rounded-full flex items-center justify-center text-white shadow-lg">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-br from-brand-blue to-brand-teal rounded-full flex items-center justify-center text-white shadow-lg">
                             <i class="fas fa-robot"></i>
                         </div>
                         <div>
                             <div class="font-bold text-brand-blue text-sm">AI Recommendation</div>
-                            <div class="text-[10px] text-gray-500 font-medium uppercase tracking-tighter">Powered by Afridata</div>
+                            <div class="text-[10px] text-gray-500 font-medium uppercase tracking-tighter">Powered by
+                                Afridata</div>
                         </div>
                     </div>
-                    <button onclick="showAIRecommendations()" class="btn-primary !py-2 !px-4 !text-xs !rounded-full">Try Beta</button>
+                    <button onclick="showAIRecommendations()" class="btn-primary !py-2 !px-4 !text-xs !rounded-full">Try
+                        Beta</button>
                 </div>
             </div>
         </div>
@@ -349,77 +403,96 @@
 
 <!-- Impact & How it Works Section -->
 <section class="py-24 bg-brand-offwhite relative overflow-hidden">
-    <div class="absolute top-0 right-0 w-64 h-64 bg-brand-teal/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-    <div class="absolute bottom-0 left-0 w-96 h-96 bg-brand-blue/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
-    
+    <div
+        class="absolute top-0 right-0 w-64 h-64 bg-brand-teal/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl">
+    </div>
+    <div
+        class="absolute bottom-0 left-0 w-96 h-96 bg-brand-blue/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl">
+    </div>
+
     <div class="max-w-7xl mx-auto px-4 relative z-10">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-                <h2 class="text-3xl md:text-5xl font-bold mb-8 leading-tight">Empowering Africa's <span class="text-brand-teal">Research Revolution</span></h2>
+                <h2 class="text-3xl md:text-5xl font-bold mb-8 leading-tight">Empowering Africa's <span
+                        class="text-brand-teal">Research Revolution</span></h2>
                 <div class="space-y-8">
                     <div class="flex space-x-6">
-                        <div class="w-14 h-14 shrink-0 rounded-2xl bg-white shadow-md flex items-center justify-center text-brand-teal text-xl">
+                        <div
+                            class="w-14 h-14 shrink-0 rounded-2xl bg-white shadow-md flex items-center justify-center text-brand-teal text-xl">
                             <i class="fas fa-microscope"></i>
                         </div>
                         <div>
                             <h4 class="text-xl font-bold mb-2">Verified Academic Rigor</h4>
-                            <p class="text-gray-600 leading-relaxed">Every dataset undergoes a multi-stage validation process to ensure integrity for high-impact research and policy making.</p>
+                            <p class="text-gray-600 leading-relaxed">Every dataset undergoes a multi-stage validation
+                                process to ensure integrity for high-impact research and policy making.</p>
                         </div>
                     </div>
-                    
+
                     <div class="flex space-x-6">
-                        <div class="w-14 h-14 shrink-0 rounded-2xl bg-white shadow-md flex items-center justify-center text-brand-blue text-xl">
+                        <div
+                            class="w-14 h-14 shrink-0 rounded-2xl bg-white shadow-md flex items-center justify-center text-brand-blue text-xl">
                             <i class="fas fa-globe-africa"></i>
                         </div>
                         <div>
                             <h4 class="text-xl font-bold mb-2">Pan-African Connectivity</h4>
-                            <p class="text-gray-600 leading-relaxed">Bridging the data gap across 54 nations, connecting regional experts with global innovators through shared open data.</p>
+                            <p class="text-gray-600 leading-relaxed">Bridging the data gap across 54 nations, connecting
+                                regional experts with global innovators through shared open data.</p>
                         </div>
                     </div>
-                    
+
                     <div class="flex space-x-6">
-                        <div class="w-14 h-14 shrink-0 rounded-2xl bg-white shadow-md flex items-center justify-center text-brand-green text-xl">
+                        <div
+                            class="w-14 h-14 shrink-0 rounded-2xl bg-white shadow-md flex items-center justify-center text-brand-green text-xl">
                             <i class="fas fa-hand-holding-heart"></i>
                         </div>
                         <div>
                             <h4 class="text-xl font-bold mb-2">Ethical Data Sovereignty</h4>
-                            <p class="text-gray-600 leading-relaxed">We prioritize local ownership and ethical standards, ensuring that data-driven value stays within the communities it describes.</p>
+                            <p class="text-gray-600 leading-relaxed">We prioritize local ownership and ethical
+                                standards, ensuring that data-driven value stays within the communities it describes.
+                            </p>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="mt-12">
-                    <a href="{% url 'community:community' %}" class="btn-primary !px-10 py-4 shadow-xl shadow-brand-blue/20 inline-block text-center no-underline">
+                    <a href="{% url 'community:community' %}"
+                        class="btn-primary !px-10 py-4 shadow-xl shadow-brand-blue/20 inline-block text-center no-underline">
                         Join the Community
                     </a>
                 </div>
             </div>
-            
+
             <div class="relative">
-                <div class="absolute -inset-4 bg-white/50 backdrop-blur-xl rounded-[2.5rem] border border-white/50 shadow-2xl -rotate-2"></div>
+                <div
+                    class="absolute -inset-4 bg-white/50 backdrop-blur-xl rounded-[2.5rem] border border-white/50 shadow-2xl -rotate-2">
+                </div>
                 <div class="relative rounded-[2rem] overflow-hidden shadow-2xl">
                     <div class="aspect-video bg-brand-blue relative">
                         <div class="absolute inset-0 flex items-center justify-center opacity-30">
                             <i class="fas fa-network-wired text-white text-9xl"></i>
                         </div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-brand-blue/80 to-transparent flex flex-col justify-end p-8">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-brand-blue/80 to-transparent flex flex-col justify-end p-8">
                             <div class="flex items-center space-x-3 mb-4">
                                 <div class="flex -space-x-2">
                                     <div class="w-8 h-8 rounded-full border-2 border-white bg-gray-200"></div>
                                     <div class="w-8 h-8 rounded-full border-2 border-white bg-gray-300"></div>
                                     <div class="w-8 h-8 rounded-full border-2 border-white bg-gray-400"></div>
                                 </div>
-                                <span class="text-xs text-white/80 font-bold uppercase tracking-widest">+5,000 Researchers</span>
+                                <span class="text-xs text-white/80 font-bold uppercase tracking-widest">+5,000
+                                    Researchers</span>
                             </div>
-                            <h3 class="text-2xl font-bold text-white mb-2 leading-tight">Catalyzing over $50M in research value across the continent.</h3>
+                            <h3 class="text-2xl font-bold text-white mb-2 leading-tight">Catalyzing over $50M in
+                                research value across the continent.</h3>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Floating Info Badge -->
                 <div class="absolute -right-8 top-12 card-fancy !p-6 shadow-2xl animate-bounce-slow">
                     <div class="flex items-center space-x-4">
-                        <div class="w-10 h-10 rounded-full bg-brand-green/20 text-brand-green flex items-center justify-center font-bold">
+                        <div
+                            class="w-10 h-10 rounded-full bg-brand-green/20 text-brand-green flex items-center justify-center font-bold">
                             98%
                         </div>
                         <div class="text-[10px] uppercase tracking-widest font-bold text-gray-500">
@@ -435,7 +508,7 @@
 <!-- Dataset Catalog Section -->
 <section class="max-w-7xl mx-auto px-4 py-20 bg-white shadow-[0_-1px_0_rgba(0,0,0,0.05)]">
     <div class="flex flex-col lg:flex-row gap-12">
-        
+
         <!-- Sidebar Navigation Filters -->
         <aside class="lg:w-1/4 space-y-8">
             <!-- Categories List -->
@@ -444,34 +517,40 @@
                     <i class="fas fa-th-large mr-2"></i> Categories
                 </h4>
                 <ul class="space-y-1 m-0 p-0 list-none">
-                    <li onclick="filterByCategory('all')" class="category-item p-3 rounded-lg cursor-pointer transition-all hover:bg-white hover:text-brand-teal font-medium text-sm flex justify-between items-center bg-white/50 mb-4 border border-gray-100">
+                    <li onclick="filterByCategory('all')"
+                        class="category-item p-3 rounded-lg cursor-pointer transition-all hover:bg-white hover:text-brand-teal font-medium text-sm flex justify-between items-center bg-white/50 mb-4 border border-gray-100">
                         <span>All Datasets</span>
-                        <span class="text-[10px] bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded-full font-bold">{{ total_datasets }}</span>
+                        <span class="text-[10px] bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded-full font-bold">{{
+                            total_datasets }}</span>
                     </li>
                     <div class="space-y-1 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
                         {% for category, count in top_categories %}
-                        <li onclick="filterByCategory('{{ category }}')" class="category-item p-3 rounded-lg cursor-pointer transition-all hover:bg-white hover:text-brand-teal text-gray-600 font-medium text-sm flex justify-between items-center">
+                        <li onclick="filterByCategory('{{ category }}')"
+                            class="category-item p-3 rounded-lg cursor-pointer transition-all hover:bg-white hover:text-brand-teal text-gray-600 font-medium text-sm flex justify-between items-center">
                             {{ category|title }}
-                            <span class="text-[10px] text-gray-400 font-bold opacity-0 group-hover:opacity-100">{{ count }}</span>
+                            <span class="text-[10px] text-gray-400 font-bold opacity-0 group-hover:opacity-100">{{ count
+                                }}</span>
                         </li>
                         {% endfor %}
                     </div>
                 </ul>
             </div>
-            
+
             <!-- License Filter Card -->
             <div class="card-fancy !p-8">
                 <h4 class="text-sm font-bold text-brand-blue uppercase tracking-widest mb-6">License Type</h4>
                 <div class="space-y-4">
                     <label class="flex items-center space-x-3 cursor-pointer group">
-                        <div class="w-5 h-5 border-2 border-gray-200 rounded-full group-hover:border-brand-teal transition-colors flex items-center justify-center p-1">
+                        <div
+                            class="w-5 h-5 border-2 border-gray-200 rounded-full group-hover:border-brand-teal transition-colors flex items-center justify-center p-1">
                             <input type="radio" name="license" onchange="filterByLicense('open')" class="hidden">
                             <div class="w-full h-full bg-brand-teal rounded-full scale-0 transition-transform"></div>
                         </div>
                         <span class="text-sm font-medium text-gray-600">Open Access</span>
                     </label>
                     <label class="flex items-center space-x-3 cursor-pointer group">
-                        <div class="w-5 h-5 border-2 border-gray-200 rounded-full group-hover:border-brand-teal transition-colors flex items-center justify-center p-1">
+                        <div
+                            class="w-5 h-5 border-2 border-gray-200 rounded-full group-hover:border-brand-teal transition-colors flex items-center justify-center p-1">
                             <input type="radio" name="license" onchange="filterByLicense('cc')" class="hidden">
                             <div class="w-full h-full bg-brand-teal rounded-full scale-0 transition-transform"></div>
                         </div>
@@ -479,23 +558,26 @@
                     </label>
                 </div>
             </div>
-            
+
             <!-- Custom Sourcing Card -->
             <div class="card-fancy !p-8 !bg-brand-blue text-white relative overflow-hidden group">
-                <div class="absolute -right-6 -top-6 opacity-10 group-hover:scale-110 transition-transform duration-700">
+                <div
+                    class="absolute -right-6 -top-6 opacity-10 group-hover:scale-110 transition-transform duration-700">
                     <i class="fas fa-headset text-8xl"></i>
                 </div>
                 <div class="relative z-10">
                     <h5 class="text-lg font-bold mb-3 !text-white">Need Custom Data?</h5>
-                    <p class="text-sm text-white/80 mb-6 leading-relaxed">Our specialized curation team can source and verify specific datasets for your research initiatives.</p>
-                    <button onclick="showContactForm()" class="w-full !bg-white !text-brand-blue !font-bold btn-primary !py-3">Contact Team</button>
+                    <p class="text-sm text-white/80 mb-6 leading-relaxed">Our specialized curation team can source and
+                        verify specific datasets for your research initiatives.</p>
+                    <button onclick="showContactForm()"
+                        class="w-full !bg-white !text-brand-blue !font-bold btn-primary !py-3">Contact Team</button>
                 </div>
             </div>
         </aside>
 
         <!-- Main Dataset Catalog Grid -->
         <div class="lg:w-3/4">
-            
+
             <!-- Featured Catalog Header -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
                 <div>
@@ -503,44 +585,52 @@
                     <p class="text-gray-500 text-sm">Verified, high-quality African data repositories</p>
                 </div>
                 <div class="flex items-center space-x-4 bg-brand-offwhite p-1 rounded-brand-btn border border-gray-100">
-                    <select onchange="sortDatasets(this.value)" class="bg-transparent border-0 text-gray-600 text-sm font-bold focus:ring-0 cursor-pointer px-4">
+                    <select onchange="sortDatasets(this.value)"
+                        class="bg-transparent border-0 text-gray-600 text-sm font-bold focus:ring-0 cursor-pointer px-4">
                         <option value="relevance">Highly Relevant</option>
                         <option value="downloads">Most Popular</option>
                         <option value="recent">Latest Releases</option>
                     </select>
                 </div>
             </div>
-            
+
             <!-- Catalog Card List -->
             <div id="datasetContainer" class="grid grid-cols-1 gap-8">
                 {% for dataset in featured_datasets %}
-                <a href="{% url 'dataset_detail' dataset.slug %}" class="group card-fancy !p-0 overflow-hidden border-2 border-transparent hover:border-brand-teal/20 transition-all duration-300 block no-underline text-inherit">
+                <a href="{% url 'dataset_detail' dataset.slug %}"
+                    class="group card-fancy !p-0 overflow-hidden border-2 border-transparent hover:border-brand-teal/20 transition-all duration-300 block no-underline text-inherit">
                     <div class="flex flex-col md:flex-row h-full">
                         <!-- Cover Image -->
                         <div class="md:w-64 h-48 md:h-auto relative overflow-hidden bg-gray-100 flex-shrink-0">
-                            <img src="{{ dataset.get_cover_photo_url }}" 
-                                 alt="Dataset Cover" 
-                                 class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700">
+                            <img src="{{ dataset.get_cover_photo_url }}" alt="Dataset Cover"
+                                class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700">
                         </div>
-                        
+
                         <!-- Metadata & Stats -->
                         <div class="p-8 flex-1">
                             <div class="flex items-center space-x-3 mb-4">
-                                <span class="bg-brand-green/10 text-brand-green text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest border border-brand-green/20">
+                                <span
+                                    class="bg-brand-green/10 text-brand-green text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest border border-brand-green/20">
                                     <i class="fas fa-check-circle mr-1"></i> Verified
                                 </span>
                                 {% if dataset.dataset_type %}
-                                <span class="bg-brand-blue/5 text-brand-blue text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest">
+                                <span
+                                    class="bg-brand-blue/5 text-brand-blue text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest">
                                     {{ dataset.get_dataset_type_display }}
                                 </span>
                                 {% endif %}
                             </div>
-                            <h4 class="text-xl font-bold mb-3 group-hover:text-brand-blue transition-colors">{{ dataset.title }}</h4>
-                            <p class="text-gray-600 text-sm mb-6 leading-relaxed">{% if dataset.bio %}{{ dataset.bio|truncatechars:150 }}{% else %}This dataset provides comprehensive insights into sectoral trends across African economies.{% endif %}</p>
-                            
+                            <h4 class="text-xl font-bold mb-3 group-hover:text-brand-blue transition-colors">{{
+                                dataset.title }}</h4>
+                            <p class="text-gray-600 text-sm mb-6 leading-relaxed">{% if dataset.bio %}{{
+                                dataset.bio|truncatechars:150 }}{% else %}This dataset provides comprehensive insights
+                                into sectoral trends across African economies.{% endif %}</p>
+
                             <div class="flex flex-wrap gap-2 mb-6">
                                 {% for topic in dataset.get_topics_list %}
-                                <span class="bg-brand-offwhite text-gray-500 text-[10px] font-bold px-3 py-1 rounded-full hover:bg-brand-teal hover:text-white transition-all cursor-default">{{ topic }}</span>
+                                <span
+                                    class="bg-brand-offwhite text-gray-500 text-[10px] font-bold px-3 py-1 rounded-full hover:bg-brand-teal hover:text-white transition-all cursor-default">{{
+                                    topic }}</span>
                                 {% endfor %}
                             </div>
 
@@ -555,7 +645,8 @@
                                 </div>
                                 <div class="text-center md:text-left border-l border-gray-100 pl-4">
                                     <div class="text-xs text-gray-400 mb-1 uppercase tracking-tighter">Rating</div>
-                                    <div class="font-bold text-brand-amber text-sm">{{ dataset.rating|floatformat:1 }} <i class="fas fa-star text-[10px]"></i></div>
+                                    <div class="font-bold text-brand-amber text-sm">{{ dataset.rating|floatformat:1 }}
+                                        <i class="fas fa-star text-[10px]"></i></div>
                                 </div>
                                 <div class="text-center md:text-left border-l border-gray-100 pl-4">
                                     <div class="text-xs text-gray-400 mb-1 uppercase tracking-tighter">Format</div>
@@ -563,17 +654,20 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Actions & Timestamp Column -->
-                        <div class="bg-gray-50/50 p-8 flex flex-col justify-center items-center md:w-56 border-t md:border-t-0 md:border-l border-gray-100">
-                            <span class="btn-primary w-full !rounded-full mb-3 shadow-md group-hover:shadow-brand-teal/20 text-center">
+                        <div
+                            class="bg-gray-50/50 p-8 flex flex-col justify-center items-center md:w-56 border-t md:border-t-0 md:border-l border-gray-100">
+                            <span
+                                class="btn-primary w-full !rounded-full mb-3 shadow-md group-hover:shadow-brand-teal/20 text-center">
                                 View Full <i class="fas fa-chevron-right ml-1 text-[10px]"></i>
                             </span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Released: {{ dataset.created_at|date:"M Y" }}</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Released: {{
+                                dataset.created_at|date:"M Y" }}</span>
                         </div>
                     </div>
                 </a>
-                
+
                 {# Fallback Empty State #}
                 {% empty %}
                 <div class="card-fancy !p-20 text-center">
@@ -582,11 +676,12 @@
                     </div>
                     <h3 class="text-xl font-bold mb-2">No Featured Datasets</h3>
                     <p class="text-gray-500 mb-8">Contribute to the African data infrastructure today.</p>
-                    <a href="{% url 'upload_dataset' %}" class="btn-primary !px-10 no-underline flex items-center justify-center">Upload Dataset</a>
+                    <a href="{% url 'upload_dataset' %}"
+                        class="btn-primary !px-10 no-underline flex items-center justify-center">Upload Dataset</a>
                 </div>
                 {% endfor %}
             </div>
-            
+
             {% if featured_datasets %}
             <div class="mt-12 text-center">
                 <a href="{% url 'dataset_list' %}" class="btn-secondary !px-12 py-4 inline-block no-underline">
@@ -603,54 +698,93 @@
 {% block extra_css %}
 <style>
     @keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: .5; transform: scale(1.2); }
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: .5;
+            transform: scale(1.2);
+        }
     }
+
     .pulse-dot {
         animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
+
     .category-item:hover {
         background-color: white !important;
         color: var(--brand-teal);
         padding-left: 1.5rem;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
+
     .custom-scrollbar::-webkit-scrollbar {
         width: 4px;
     }
+
     .custom-scrollbar::-webkit-scrollbar-track {
         background: transparent;
     }
+
     .custom-scrollbar::-webkit-scrollbar-thumb {
         background: #e2e8f0;
         border-radius: 10px;
     }
+
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
         background: #cbd5e1;
     }
+
     .stats-counter:hover {
         transform: translateY(-5px);
         transition: transform 0.3s ease;
     }
+
     .topic-tag:hover i {
         transform: scale(1.1) rotate(-5deg);
         opacity: 0.2;
         transition: all 0.5s ease;
     }
+
     .trending-card-animation {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
     @keyframes bounce-slow {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
     }
+
     .animate-bounce-slow {
         animation: bounce-slow 4s ease-in-out infinite;
     }
-    .topic-card-0 { background: linear-gradient(135deg, #0B4F6C, #1B998B); }
-    .topic-card-1 { background: linear-gradient(135deg, #1B998B, #7BC67B); }
-    .topic-card-2 { background: linear-gradient(135deg, #4A5568, #0B4F6C); }
-    .topic-card-3 { background: linear-gradient(135deg, #F2C14E, #d97706); }
+
+    .topic-card-0 {
+        background: linear-gradient(135deg, #0B4F6C, #1B998B);
+    }
+
+    .topic-card-1 {
+        background: linear-gradient(135deg, #1B998B, #7BC67B);
+    }
+
+    .topic-card-2 {
+        background: linear-gradient(135deg, #4A5568, #0B4F6C);
+    }
+
+    .topic-card-3 {
+        background: linear-gradient(135deg, #F2C14E, #d97706);
+    }
 </style>
 {% endblock %}
 
@@ -668,7 +802,7 @@
     }
 
     // Search on enter keypress
-    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+    document.getElementById('searchInput').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             performSearch();
         }
@@ -729,8 +863,8 @@
             </div>
         `;
         document.body.appendChild(modal);
-    
-        modal.addEventListener('click', function(e) {
+
+        modal.addEventListener('click', function (e) {
             if (e.target === modal) {
                 closeModal();
             }
@@ -764,7 +898,7 @@
                 </form>
             </div>
         `;
-        document.body.appendChild(modal);   
+        document.body.appendChild(modal);
     }
 
     // Submit custom sourcing form request
@@ -789,11 +923,11 @@
         if (IS_AUTHENTICATED) {
             const referralCode = '{{ referral_code|default:"" }}';
             const referralUrl = `${window.location.origin}/register/?ref=${referralCode}`;
-        
+
             if (navigator.clipboard) {
-                navigator.clipboard.writeText(referralUrl).then(function() {
+                navigator.clipboard.writeText(referralUrl).then(function () {
                     showNotification('Referral link copied to clipboard!', 'success');
-                }).catch(function() {
+                }).catch(function () {
                     fallbackCopyTextToClipboard(referralUrl);
                 });
             } else {
@@ -814,7 +948,7 @@
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-    
+
         try {
             document.execCommand('copy');
             showNotification('Referral link copied to clipboard!', 'success');
@@ -822,7 +956,7 @@
             console.error('Fallback copy failed', err);
             showNotification('Failed to copy referral link', 'error');
         }
-    
+
         document.body.removeChild(textArea);
     }
 
@@ -834,23 +968,22 @@
                 notification.parentNode.removeChild(notification);
             }
         });
-    
+
         const notification = document.createElement('div');
-        notification.className = `notification-toast fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transform transition-all duration-300 ${
-            type === 'success' ? 'bg-green-500' : 'bg-red-500'
-        } text-white`;
+        notification.className = `notification-toast fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transform transition-all duration-300 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            } text-white`;
         notification.textContent = message;
-    
+
         notification.style.transform = 'translateX(100%)';
         notification.style.opacity = '0';
-    
+
         document.body.appendChild(notification);
-    
+
         setTimeout(() => {
             notification.style.transform = 'translateX(0)';
             notification.style.opacity = '1';
         }, 10);
-    
+
         setTimeout(() => {
             notification.style.transform = 'translateX(100%)';
             notification.style.opacity = '0';
@@ -870,12 +1003,12 @@
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
             <p class="text-gray-600">Loading datasets...</p>
         `;
-    
+
         const container = document.getElementById('datasetContainer');
         if (container) {
             container.innerHTML = '';
             container.appendChild(loader);
-        
+
             setTimeout(() => {
                 container.innerHTML = '<p class="text-center text-gray-500">No datasets found matching your filters.</p>';
             }, 1000);
@@ -886,12 +1019,12 @@
     function initializeTooltips() {
         const statsCounters = document.querySelectorAll('.stats-counter');
         statsCounters.forEach(counter => {
-            counter.addEventListener('mouseenter', function() {
+            counter.addEventListener('mouseenter', function () {
                 this.style.transform = 'scale(1.05)';
                 this.style.transition = 'transform 0.2s ease';
             });
-        
-            counter.addEventListener('mouseleave', function() {
+
+            counter.addEventListener('mouseleave', function () {
                 this.style.transform = 'scale(1)';
             });
         });
@@ -900,7 +1033,7 @@
     // Numerical statistic counter scroll animation
     function animateCounters() {
         const counters = document.querySelectorAll('.animate-number');
-        
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -909,7 +1042,7 @@
                     let count = 0;
                     const duration = 2000;
                     const increment = target / (duration / 16);
-                    
+
                     const updateCount = () => {
                         count += increment;
                         if (count < target) {
@@ -932,11 +1065,11 @@
     function initializeCategoryEffects() {
         const categoryItems = document.querySelectorAll('.category-item');
         categoryItems.forEach(item => {
-            item.addEventListener('mouseenter', function() {
+            item.addEventListener('mouseenter', function () {
                 this.style.paddingLeft = '1.5rem';
             });
-        
-            item.addEventListener('mouseleave', function() {
+
+            item.addEventListener('mouseleave', function () {
                 this.style.paddingLeft = '0.75rem';
             });
         });
@@ -974,18 +1107,18 @@
     }
 
     // Init animations and interactive elements on DOM load
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         initializeTooltips();
         initializeCategoryEffects();
         initializeTrendingCards();
         initializePulseAnimations();
         animateCounters();
-        
+
         if (IS_AUTHENTICATED) {
             setInterval(refreshTokenBalance, 300000);
         }
 
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 closeModal();
             }

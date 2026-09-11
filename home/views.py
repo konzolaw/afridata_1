@@ -1,5 +1,5 @@
 # home/views.py
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.db.models import Q, Sum, Avg, Count
 from django.utils import timezone
@@ -84,6 +84,9 @@ def default_home(request):
     For authenticated users: shows personalized recommendations.
     For anonymous users: shows popular/trending datasets.
     """
+    if request.user.is_authenticated:
+        return redirect('home')
+
     # Get overall statistics
     stats = Dataset.objects.aggregate(
         total_datasets=Count('id'),

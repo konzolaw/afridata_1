@@ -100,6 +100,7 @@
             </a>
         </div>
 
+        {% comment %}
         <!-- Global Search (Desktop) -->
         <div class="hidden md:block relative flex-1 max-w-md mx-8">
             <div class="relative group">
@@ -127,6 +128,7 @@
                 </div>
             </div>
         </div>
+        {% endcomment %}
 
         <nav class="hidden md:flex items-center space-x-8 text-[15px] font-medium tracking-wide m-0 p-0 font-mono">
             {% if user.is_authenticated %}
@@ -279,6 +281,7 @@
             l.style.setProperty('text-decoration', 'none', 'important');
         });
 
+        /*
         // Global Search Logic
         const searchInput = document.getElementById('globalSearchInput');
         const searchDropdown = document.getElementById('globalSearchDropdown');
@@ -394,5 +397,6 @@
 
             searchResults.innerHTML = html;
         }
+        */
     });
 </script>
